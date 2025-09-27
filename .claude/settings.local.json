@@ -10,7 +10,8 @@
       "Bash(chmod:*)",
       "Bash(docker build:*)",
       "WebFetch(domain:port-9000-allsport-m10pz2kw69fd7f89.sel4.cloudtype.app)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "WebFetch(domain:docs.cloudtype.io)"
     ],
     "deny": [],
     "ask": []
