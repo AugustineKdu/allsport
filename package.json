@@ -4,7 +4,10 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "vite"
+        "dev": "vite",
+        "postinstall": "composer install --no-dev --optimize-autoloader --no-interaction",
+        "prebuild": "php -v && composer install --no-dev --optimize-autoloader --no-interaction",
+        "postbuild": "bash postbuild.sh"
     },
     "devDependencies": {
         "@tailwindcss/forms": "^0.5.2",

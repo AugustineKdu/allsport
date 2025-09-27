@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# CloudType Template Build Script
-echo "🚀 Starting Laravel build process..."
+# Simple CloudType Build Script (No Frontend Build)
+echo "🚀 Starting simple Laravel build process..."
 
 # Check PHP version
 echo "🐘 PHP Version: $(php --version | head -1)"
@@ -9,13 +9,6 @@ echo "🐘 PHP Version: $(php --version | head -1)"
 # Install dependencies
 echo "📦 Installing Composer dependencies..."
 composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
-
-echo "📦 Installing NPM dependencies..."
-npm install --production
-
-# Build frontend assets
-echo "🔨 Building frontend assets..."
-npm run build
 
 # Setup environment
 echo "⚙️ Setting up environment..."
@@ -53,4 +46,4 @@ php artisan db:seed --force
 echo "🔒 Setting permissions..."
 chmod -R 755 storage bootstrap/cache
 
-echo "✅ Build completed successfully!"
+echo "✅ Simple build completed successfully!"
