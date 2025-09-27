@@ -34,9 +34,17 @@ options:
     - name: APP_URL
       value: https://port-9000-allsport-m10pz2kw69fd7f89.sel4.cloudtype.app
     - name: DB_CONNECTION
-      value: sqlite
+      value: mysql
+    - name: DB_HOST
+      value: mysql
+    - name: DB_PORT
+      value: "3306"
     - name: DB_DATABASE
-      value: /app/database/database.sqlite
+      value: allsports
+    - name: DB_USERNAME
+      value: root
+    - name: DB_PASSWORD
+      value: password
     - name: SESSION_DRIVER
       value: file
     - name: CACHE_STORE
@@ -60,3 +68,12 @@ context:
     url: https://github.com/AugustineKdu/allsport.git
     branch: main
   preset: laravel
+services:
+  - name: mysql
+    app: mysql:8.0
+    options:
+      env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: password
+        - name: MYSQL_DATABASE
+          value: allsports

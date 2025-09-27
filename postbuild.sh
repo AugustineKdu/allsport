@@ -21,11 +21,17 @@ php artisan view:clear 2>/dev/null || true
 php artisan route:clear 2>/dev/null || true
 
 # Setup database
-echo "🗄️ Setting up database..."
-if [ ! -f database/database.sqlite ]; then
-    touch database/database.sqlite
-fi
-chmod 664 database/database.sqlite 2>/dev/null || true
+echo "🗄️ Setting up MySQL database..."
+# Wait for MySQL to be ready
+echo "⏳ Waiting for MySQL to be ready..."
+for i in {1..30}; do
+    if php artisan tinker --execute="DB::connection()->getPdo();" 2>/dev/null; then
+        echo "✅ MySQL connection successful!"
+        break
+    fi
+    echo "⏳ Waiting for MySQL... ($i/30)"
+    sleep 2
+done
 
 # Run migrations
 echo "🔄 Running database migrations..."
