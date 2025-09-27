@@ -53,4 +53,9 @@ echo "Storage writable: $([ -w storage ] && echo "✅ Yes" || echo "❌ No")"
 # Use environment variable PORT if available, otherwise default to 9000
 PORT=${PORT:-9000}
 echo "🚀 Starting PHP server on port $PORT..."
-php artisan serve --host=0.0.0.0 --port=$PORT --no-reload
+
+# Ensure we're in the right directory
+cd /app 2>/dev/null || cd "$(dirname "$0")"
+
+# Start Laravel server (automatically serves from public/ directory)
+php artisan serve --host=0.0.0.0 --port=$PORT --no-reload --tries=3

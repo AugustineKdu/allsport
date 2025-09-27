@@ -39,4 +39,18 @@ php artisan db:seed --force
 echo "🔒 Setting permissions..."
 chmod -R 755 storage bootstrap/cache 2>/dev/null || true
 
+# Ensure public/build directory exists and has proper assets
+echo "📦 Checking built assets..."
+if [ -d "public/build" ]; then
+    echo "✅ Built assets found in public/build"
+    ls -la public/build/ || true
+else
+    echo "⚠️ No built assets found, checking for alternative paths..."
+    find public -name "*.css" -o -name "*.js" | head -5 || true
+fi
+
+# Clear view cache to ensure latest compiled assets are used
+echo "🧹 Clearing view cache for asset updates..."
+php artisan view:clear 2>/dev/null || true
+
 echo "✅ Laravel post-build setup completed!"

@@ -1,8 +1,8 @@
 name: allsport
 app: php
 options:
-  ports: 8080
-  docbase: /public
+  ports: 9000
+  docbase: /
   nodejs: true
   env:
     - name: APP_NAME
@@ -13,6 +13,10 @@ options:
       value: base64:SsWtZfj/IW0uDbw5r0aGQSd0CB58kUay7aMg/KdvQ5o=
     - name: APP_DEBUG
       value: "true"
+    - name: SESSION_SECURE_COOKIE
+      value: "false"
+    - name: SESSION_SAME_SITE
+      value: "lax"
     - name: APP_URL
       value: https://port-9000-allsport-m10pz2kw69fd7f89.sel4.cloudtype.app
     - name: DB_CONNECTION
