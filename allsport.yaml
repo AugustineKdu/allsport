@@ -2,7 +2,7 @@ name: allsport
 app: php
 options:
   ports: 9000
-  docbase: /
+  docbase: /public
   nodejs: true
   env:
     - name: APP_NAME
@@ -13,30 +13,12 @@ options:
       value: base64:SsWtZfj/IW0uDbw5r0aGQSd0CB58kUay7aMg/KdvQ5o=
     - name: APP_DEBUG
       value: "false"
-    - name: VITE_ENABLED
-      value: "false"
-    - name: SESSION_SECURE_COOKIE
-      value: "true"
-    - name: SESSION_SAME_SITE
-      value: "lax"
-    - name: CSRF_COOKIE_SECURE
-      value: "true"
-    - name: SESSION_LIFETIME
-      value: "720"
-    - name: SANCTUM_STATEFUL_DOMAINS
-      value: "port-9000-allsport-m10pz2kw69fd7f89.sel4.cloudtype.app"
-    - name: SESSION_COOKIE
-      value: "laravel_session"
-    - name: ASSET_URL
-      value: "https://port-9000-allsport-m10pz2kw69fd7f89.sel4.cloudtype.app"
-    - name: MIX_ASSET_URL
-      value: "https://port-9000-allsport-m10pz2kw69fd7f89.sel4.cloudtype.app"
     - name: APP_URL
       value: https://port-9000-allsport-m10pz2kw69fd7f89.sel4.cloudtype.app
     - name: DB_CONNECTION
       value: sqlite
     - name: DB_DATABASE
-      value: database/database.sqlite
+      value: /tmp/database.sqlite
     - name: SESSION_DRIVER
       value: file
     - name: CACHE_STORE
@@ -46,11 +28,9 @@ options:
     - name: LOG_CHANNEL
       value: errorlog
     - name: LOG_LEVEL
-      value: error
-    - name: FORCE_HTTPS
-      value: "true"
-    - name: SECURE_HEADERS
-      value: "true"
+      value: debug
+    - name: SESSION_LIFETIME
+      value: "120"
   buildenv: []
   prestart: ""
   start: bash start.sh

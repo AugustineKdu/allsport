@@ -1,30 +1,25 @@
 #!/bin/bash
 
-# CloudType Start Script (for NPM Build)
+# CloudType Start Script for AllSports
 echo "🎯 Starting AllSports application..."
 
-# Install MySQL PHP extension if not present
-echo "🔧 Installing MySQL PHP extension..."
-if ! php -m | grep -q mysql; then
-    echo "📦 Installing MySQL extension..."
-    # Try different methods to install MySQL
+# Install SQLite PHP extension if not present (CloudType Laravel template should have this)
+echo "🔧 Checking SQLite PHP extension..."
+if ! php -m | grep -q sqlite3; then
+    echo "📦 Installing SQLite3 extension..."
     apt-get update -qq 2>/dev/null || true
-    apt-get install -y php-mysql 2>/dev/null || true
-    apt-get install -y php-pdo 2>/dev/null || true
-
-    # Enable extension if available
-    echo "extension=mysql" >> /usr/local/etc/php/conf.d/mysql.ini 2>/dev/null || true
-    echo "extension=pdo_mysql" >> /usr/local/etc/php/conf.d/mysql.ini 2>/dev/null || true
+    apt-get install -y php-sqlite3 2>/dev/null || true
+    apt-get install -y sqlite3 2>/dev/null || true
 else
-    echo "✅ MySQL extension already available"
+    echo "✅ SQLite3 extension available"
 fi
 
-# Verify MySQL is working
-echo "🔍 Verifying MySQL availability..."
-if php -r "new PDO('mysql:host=localhost;dbname=test', 'root', '');" 2>/dev/null; then
-    echo "✅ MySQL PDO working correctly"
+# Verify SQLite is working
+echo "🔍 Verifying SQLite availability..."
+if php -r "try { new PDO('sqlite::memory:'); echo 'OK'; } catch(Exception \$e) { echo 'FAIL'; }" 2>/dev/null | grep -q "OK"; then
+    echo "✅ SQLite PDO working correctly"
 else
-    echo "⚠️ MySQL PDO not working, will try alternative setup"
+    echo "⚠️ SQLite PDO not working, will try alternative setup"
 fi
 
 # Check if Laravel is properly set up
@@ -34,35 +29,36 @@ if [ ! -f .env ]; then
     php artisan key:generate --force
 fi
 
-# Set MySQL environment variables for production
-echo "🔧 Setting up MySQL configuration..."
-if ! grep -q "DB_CONNECTION=mysql" .env; then
-    echo "DB_CONNECTION=mysql" >> .env
-    echo "DB_HOST=localhost" >> .env
-    echo "DB_PORT=3306" >> .env
-    echo "DB_DATABASE=allsports" >> .env
-    echo "DB_USERNAME=root" >> .env
-    echo "DB_PASSWORD=" >> .env
-    echo "APP_NAME=AllSports" >> .env
-    echo "APP_ENV=production" >> .env
-    echo "APP_DEBUG=false" >> .env
-fi
-
-# Create MySQL database if it doesn't exist
-echo "🔄 Setting up MySQL database..."
-if mysql -u root -e "CREATE DATABASE IF NOT EXISTS allsports CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" 2>/dev/null; then
-    echo "✅ MySQL database created/verified"
+# Set up SQLite database for CloudType
+echo "🔧 Setting up SQLite database..."
+if [ ! -f /tmp/database.sqlite ]; then
+    echo "📦 Creating SQLite database..."
+    touch /tmp/database.sqlite
+    chmod 664 /tmp/database.sqlite
+    echo "✅ SQLite database created"
 else
-    echo "⚠️ Could not create MySQL database, continuing with existing setup"
+    echo "✅ SQLite database already exists"
 fi
 
-# Try to run migrations
-echo "🔄 Attempting database migrations..."
-if php artisan migrate --force 2>/dev/null; then
+# Ensure .env has correct SQLite settings
+echo "🔧 Ensuring .env configuration..."
+if ! grep -q "DB_DATABASE=/tmp/database.sqlite" .env; then
+    echo "DB_DATABASE=/tmp/database.sqlite" >> .env
+fi
+
+# Generate app key if not set
+echo "🔑 Generating application key..."
+php artisan key:generate --force --no-interaction 2>/dev/null || echo "⚠️ Key generation failed"
+
+# Run migrations
+echo "🔄 Running database migrations..."
+if php artisan migrate --force --no-interaction 2>/dev/null; then
     echo "✅ Migrations completed successfully"
-    php artisan db:seed --force 2>/dev/null || echo "⚠️ Seeding failed, continuing without seed data"
+    php artisan db:seed --force --no-interaction 2>/dev/null || echo "⚠️ Seeding failed, continuing without seed data"
 else
-    echo "⚠️ Database migrations failed, continuing with file-based sessions"
+    echo "❌ Database migrations failed"
+    echo "🔍 Debugging migration error..."
+    php artisan migrate --force --no-interaction 2>&1 | head -20
 fi
 
 # Clear caches to prevent 500 errors (critical for NPM builds)
@@ -128,5 +124,27 @@ echo "🚀 Starting PHP server on port $PORT..."
 # Ensure we're in the right directory
 cd /app 2>/dev/null || cd "$(dirname "$0")"
 
-# Start Laravel server (automatically serves from public/ directory)
+# Show final configuration
+echo "📋 Final Configuration:"
+echo "APP_NAME: $(grep '^APP_NAME=' .env | cut -d'=' -f2)"
+echo "APP_ENV: $(grep '^APP_ENV=' .env | cut -d'=' -f2)"
+echo "DB_CONNECTION: $(grep '^DB_CONNECTION=' .env | cut -d'=' -f2)"
+echo "DB_DATABASE: $(grep '^DB_DATABASE=' .env | cut -d'=' -f2)"
+echo "Database exists: $([ -f /tmp/database.sqlite ] && echo "✅ Yes" || echo "❌ No")"
+
+# Show PHP version and extensions
+echo "📋 PHP Information:"
+php -v | head -1
+echo "SQLite extension: $(php -m | grep -q sqlite3 && echo "✅ Available" || echo "❌ Missing")"
+
+# Final test
+echo "🧪 Final application test..."
+if php artisan --version 2>/dev/null; then
+    echo "✅ Laravel is working correctly"
+else
+    echo "❌ Laravel test failed"
+fi
+
+# Start Laravel server
+echo "🚀 Starting Laravel server on port $PORT..."
 php artisan serve --host=0.0.0.0 --port=$PORT --no-reload --tries=3
