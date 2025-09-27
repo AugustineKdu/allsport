@@ -43,5 +43,7 @@ echo "Database file: $([ -f database/database.sqlite ] && echo "✅ Found" || ec
 echo "Storage writable: $([ -w storage ] && echo "✅ Yes" || echo "❌ No")"
 
 # Start PHP built-in server for CloudType
-echo "🚀 Starting PHP server on port 8080..."
-php artisan serve --host=0.0.0.0 --port=8080 --no-reload
+# Use environment variable PORT if available, otherwise default to 9000
+PORT=${PORT:-9000}
+echo "🚀 Starting PHP server on port $PORT..."
+php artisan serve --host=0.0.0.0 --port=$PORT --no-reload

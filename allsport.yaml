@@ -12,9 +12,9 @@ options:
     - name: APP_KEY
       value: base64:SsWtZfj/IW0uDbw5r0aGQSd0CB58kUay7aMg/KdvQ5o=
     - name: APP_DEBUG
-      value: "false"
+      value: "true"
     - name: APP_URL
-      value: https://allsport.cloudtype.app
+      value: https://port-9000-allsport-m10pz2kw69fd7f89.sel4.cloudtype.app
     - name: DB_CONNECTION
       value: sqlite
     - name: DB_DATABASE
