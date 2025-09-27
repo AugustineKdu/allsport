@@ -13,6 +13,8 @@ options:
       value: base64:SsWtZfj/IW0uDbw5r0aGQSd0CB58kUay7aMg/KdvQ5o=
     - name: APP_DEBUG
       value: "true"
+    - name: VITE_ENABLED
+      value: "false"
     - name: SESSION_SECURE_COOKIE
       value: "false"
     - name: SESSION_SAME_SITE

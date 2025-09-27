@@ -44,9 +44,22 @@ echo "📦 Checking built assets..."
 if [ -d "public/build" ]; then
     echo "✅ Built assets found in public/build"
     ls -la public/build/ || true
+
+    # Check if manifest.json exists
+    if [ -f "public/build/manifest.json" ]; then
+        echo "✅ Vite manifest.json found"
+        echo "Manifest content preview:"
+        head -5 public/build/manifest.json || true
+    else
+        echo "⚠️ Vite manifest.json missing, will use fallback CSS"
+    fi
 else
-    echo "⚠️ No built assets found, checking for alternative paths..."
-    find public -name "*.css" -o -name "*.js" | head -5 || true
+    echo "⚠️ No built assets found, will use CDN fallback"
+    echo "Creating empty public/build directory for future builds..."
+    mkdir -p public/build || true
+
+    # Create a simple manifest for compatibility
+    echo '{}' > public/build/manifest.json || true
 fi
 
 # Clear view cache to ensure latest compiled assets are used
