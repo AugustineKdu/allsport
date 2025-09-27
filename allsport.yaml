@@ -31,6 +31,26 @@ options:
       value: debug
     - name: SESSION_LIFETIME
       value: "120"
+    # HTTPS Security Settings
+    - name: FORCE_HTTPS
+      value: "true"
+    - name: SESSION_SECURE_COOKIE
+      value: "true"
+    - name: SESSION_SAME_SITE
+      value: "lax"
+    - name: CSRF_COOKIE_SECURE
+      value: "true"
+    - name: CSRF_COOKIE_SAME_SITE
+      value: "lax"
+    - name: SANCTUM_STATEFUL_DOMAINS
+      value: "port-9000-allsport-m10pz2kw69fd7f89.sel4.cloudtype.app"
+    - name: SESSION_COOKIE
+      value: "laravel_session"
+    # Asset URLs for HTTPS
+    - name: ASSET_URL
+      value: "https://port-9000-allsport-m10pz2kw69fd7f89.sel4.cloudtype.app"
+    - name: MIX_ASSET_URL
+      value: "https://port-9000-allsport-m10pz2kw69fd7f89.sel4.cloudtype.app"
   buildenv: []
   prestart: ""
   start: bash start.sh
