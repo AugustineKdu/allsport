@@ -1,0 +1,28 @@
+name: allsports
+app:
+  env:
+    - name: APP_ENV
+      value: production
+    - name: APP_DEBUG
+      value: "false"
+    - name: DB_CONNECTION
+      value: sqlite
+    - name: DB_DATABASE
+      value: /var/www/html/database/database.sqlite
+    - name: SESSION_DRIVER
+      value: database
+    - name: CACHE_STORE
+      value: database
+    - name: QUEUE_CONNECTION
+      value: database
+  ports:
+    - containerPort: 80
+      servicePort: 80
+  healthcheck:
+    httpGet:
+      path: /
+      port: 80
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3

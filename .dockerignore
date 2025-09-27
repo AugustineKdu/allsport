@@ -1,7 +1,6 @@
 node_modules
 .git
 .gitignore
-README.md
 .env
 .env.backup
 .phpunit.result.cache
@@ -11,10 +10,15 @@ npm-debug.log
 yarn-error.log
 .DS_Store
 Thumbs.db
-/public/build
 /public/hot
 /.idea
 /.vscode
 /.fleet
 /.nova
 /.zed
+/.claude
+vendor
+storage/logs/*
+!storage/logs/.gitignore
+bootstrap/cache/*
+!bootstrap/cache/.gitignore
