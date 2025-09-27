@@ -1,126 +1,89 @@
 <x-guest-layout>
     <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+    @if (session('status'))
+        <div class="mb-4 font-medium text-sm text-green-600">
+            {{ session('status') }}
+        </div>
+    @endif
 
-    <form method="POST" action="{{ route('login') }}" id="login-form">
+    <!-- Error Messages -->
+    @if (session('warning'))
+        <div class="mb-4 font-medium text-sm text-orange-600">
+            {{ session('warning') }}
+        </div>
+    @endif
+
+    <div class="text-center mb-6">
+        <h2 class="text-lg font-semibold text-gray-800">로그인</h2>
+        <p class="text-sm text-gray-600">계정에 로그인하세요</p>
+    </div>
+
+    <form method="POST" action="{{ route('login') }}">
         @csrf
-        <input type="hidden" name="_token" id="csrf-token" value="{{ csrf_token() }}">
 
         <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        <div class="mb-4">
+            <label for="email" class="form-label">이메일</label>
+            <input id="email"
+                   class="form-input @error('email') border-red-500 @enderror"
+                   type="email"
+                   name="email"
+                   value="{{ old('email') }}"
+                   required
+                   autofocus
+                   autocomplete="username"
+                   placeholder="이메일을 입력하세요">
+            @error('email')
+                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+            @enderror
         </div>
 
         <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+        <div class="mb-4">
+            <label for="password" class="form-label">비밀번호</label>
+            <input id="password"
+                   class="form-input @error('password') border-red-500 @enderror"
+                   type="password"
+                   name="password"
+                   required
+                   autocomplete="current-password"
+                   placeholder="비밀번호를 입력하세요">
+            @error('password')
+                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+            @enderror
         </div>
 
         <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
+        <div class="flex items-center mb-6">
+            <input id="remember_me"
+                   type="checkbox"
+                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                   name="remember">
+            <label for="remember_me" class="ml-2 block text-sm text-gray-700">
+                로그인 상태 유지
             </label>
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
+        <div class="flex flex-col space-y-3">
+            <button type="submit" class="btn-primary w-full">
+                로그인
+            </button>
 
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
+            <div class="text-center">
+                <a href="{{ route('register') }}"
+                   class="text-sm text-blue-600 hover:text-blue-500">
+                    계정이 없으신가요? 회원가입
+                </a>
+            </div>
+
+            @if (Route::has('password.request'))
+                <div class="text-center">
+                    <a href="{{ route('password.request') }}"
+                       class="text-sm text-gray-600 hover:text-gray-500">
+                        비밀번호를 잊으셨나요?
+                    </a>
+                </div>
+            @endif
         </div>
     </form>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('login-form');
-            const csrfToken = document.getElementById('csrf-token');
-
-            // Refresh CSRF token periodically
-            setInterval(function() {
-                fetch('/csrf-token', {
-                    method: 'GET',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.csrf_token) {
-                        csrfToken.value = data.csrf_token;
-                        // Update meta tag too
-                        const metaTag = document.querySelector('meta[name="csrf-token"]');
-                        if (metaTag) {
-                            metaTag.setAttribute('content', data.csrf_token);
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.log('CSRF token refresh failed:', error);
-                });
-            }, 300000); // Refresh every 5 minutes
-
-            // Handle form submission with retry on CSRF error
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                const formData = new FormData(form);
-
-                fetch(form.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then(response => {
-                    if (response.status === 419) {
-                        // CSRF token expired, refresh and retry
-                        return fetch('/csrf-token')
-                            .then(res => res.json())
-                            .then(data => {
-                                csrfToken.value = data.csrf_token;
-                                formData.set('_token', data.csrf_token);
-                                return fetch(form.action, {
-                                    method: 'POST',
-                                    body: formData,
-                                    headers: {
-                                        'X-Requested-With': 'XMLHttpRequest'
-                                    }
-                                });
-                            });
-                    }
-                    return response;
-                })
-                .then(response => {
-                    if (response.redirected) {
-                        window.location.href = response.url;
-                    } else if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    // Fallback: submit form normally
-                    form.submit();
-                });
-            });
-        });
-    </script>
 </x-guest-layout>

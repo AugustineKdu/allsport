@@ -24,18 +24,23 @@ class VerifyCsrfToken extends Middleware
      */
     public function handle($request, \Closure $next)
     {
-        // In development/local environment, be more lenient with CSRF
-        if (app()->environment(['local', 'development']) || config('app.debug')) {
-            // Still run CSRF but with more relaxed settings
-            try {
-                return parent::handle($request, $next);
-            } catch (\Illuminate\Session\TokenMismatchException $e) {
-                // If CSRF fails in debug mode, regenerate token and try again
-                $request->session()->regenerateToken();
-                return redirect()->back()->withInput()->with('warning', 'Security token refreshed. Please try again.');
-            }
-        }
+        // Be more lenient with CSRF for cloud deployment
+        try {
+            return parent::handle($request, $next);
+        } catch (\Illuminate\Session\TokenMismatchException $e) {
+            // If CSRF fails, regenerate token and redirect back with clear message
+            $request->session()->regenerateToken();
 
-        return parent::handle($request, $next);
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => 'CSRF token mismatch. Please refresh and try again.',
+                    'csrf_token' => csrf_token()
+                ], 419);
+            }
+
+            return redirect()->back()
+                ->withInput($request->except(['password', 'password_confirmation']))
+                ->with('warning', '보안 토큰이 만료되었습니다. 다시 시도해주세요.');
+        }
     }
 }
