@@ -10,7 +10,9 @@ RUN apk add --no-cache \
     npm \
     nginx \
     supervisor \
-    sqlite
+    sqlite \
+    sqlite-dev \
+    libzip-dev
 
 # Install minimal PHP extensions for Laravel
 RUN docker-php-ext-install -j$(nproc) \
