@@ -1,0 +1,41 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('team_members', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('team_id')->constrained('teams')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->enum('role', ['owner', 'member'])->default('member');
+            $table->enum('status', ['pending', 'approved', 'rejected', 'left'])->default('pending');
+            $table->text('message')->nullable();
+            $table->timestamp('joined_at')->nullable();
+            $table->timestamp('last_active_at')->nullable();
+            $table->timestamps();
+
+            // Unique constraint to prevent duplicate membership requests
+            $table->unique(['team_id', 'user_id']);
+
+            // Indexes for performance
+            $table->index(['team_id', 'status']);
+            $table->index('user_id');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('team_members');
+    }
+};
