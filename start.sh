@@ -15,8 +15,15 @@ if [ ! -f database/database.sqlite ]; then
     echo "⚠️ Database not found, creating and setting up..."
     touch database/database.sqlite
     chmod 664 database/database.sqlite 2>/dev/null || true
-    php artisan migrate --force
-    php artisan db:seed --force
+
+    # Try to run migrations, but don't fail if SQLite driver is missing
+    echo "🔄 Attempting database migrations..."
+    if php artisan migrate --force 2>/dev/null; then
+        echo "✅ Migrations completed successfully"
+        php artisan db:seed --force 2>/dev/null || echo "⚠️ Seeding failed, continuing without seed data"
+    else
+        echo "⚠️ Database migrations failed (possibly missing SQLite driver), continuing with file-based sessions"
+    fi
 fi
 
 # Clear caches to prevent 500 errors (critical for NPM builds)
