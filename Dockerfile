@@ -4,10 +4,6 @@ FROM php:8.2-fpm-alpine
 RUN apk add --no-cache \
     git \
     curl \
-    libpng-dev \
-    libjpeg-turbo-dev \
-    freetype-dev \
-    libzip-dev \
     zip \
     unzip \
     nodejs \
@@ -16,13 +12,11 @@ RUN apk add --no-cache \
     supervisor \
     sqlite
 
-# Install PHP extensions
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) \
+# Install minimal PHP extensions for Laravel
+RUN docker-php-ext-install -j$(nproc) \
         pdo \
         pdo_sqlite \
         zip \
-        gd \
         bcmath
 
 # Install Composer
