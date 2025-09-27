@@ -3,24 +3,47 @@
 # CloudType Start Script for AllSports
 echo "🎯 Starting AllSports application..."
 
-# Install SQLite PHP extension if not present (CloudType Laravel template should have this)
-echo "🔧 Checking SQLite PHP extension..."
-if ! php -m | grep -q sqlite3; then
-    echo "📦 Installing SQLite3 extension..."
-    apt-get update -qq 2>/dev/null || true
-    apt-get install -y php-sqlite3 2>/dev/null || true
-    apt-get install -y sqlite3 2>/dev/null || true
-else
-    echo "✅ SQLite3 extension available"
-fi
+# Force install SQLite PHP extension (CRITICAL FIX)
+echo "🔧 FORCE Installing SQLite PHP extension..."
+echo "📦 Updating package list..."
+apt-get update -qq 2>/dev/null || true
+
+echo "📦 Installing SQLite3..."
+apt-get install -y sqlite3 2>/dev/null || true
+
+echo "📦 Installing PHP SQLite extensions..."
+apt-get install -y php-sqlite3 2>/dev/null || true
+apt-get install -y php-pdo-sqlite 2>/dev/null || true
+apt-get install -y php-pdo 2>/dev/null || true
+
+echo "📦 Installing additional PHP extensions..."
+apt-get install -y php-common 2>/dev/null || true
+apt-get install -y php-mbstring 2>/dev/null || true
+apt-get install -y php-xml 2>/dev/null || true
+apt-get install -y php-zip 2>/dev/null || true
+
+# Enable extensions manually
+echo "🔧 Enabling SQLite extensions..."
+echo "extension=pdo_sqlite" >> /usr/local/etc/php/conf.d/sqlite.ini 2>/dev/null || true
+echo "extension=sqlite3" >> /usr/local/etc/php/conf.d/sqlite.ini 2>/dev/null || true
+echo "extension=pdo" >> /usr/local/etc/php/conf.d/sqlite.ini 2>/dev/null || true
+
+# Restart PHP-FPM if available
+echo "🔄 Restarting PHP services..."
+service php-fpm restart 2>/dev/null || true
+service apache2 restart 2>/dev/null || true
 
 # Verify SQLite is working
-echo "🔍 Verifying SQLite availability..."
-if php -r "try { new PDO('sqlite::memory:'); echo 'OK'; } catch(Exception \$e) { echo 'FAIL'; }" 2>/dev/null | grep -q "OK"; then
-    echo "✅ SQLite PDO working correctly"
-else
-    echo "⚠️ SQLite PDO not working, will try alternative setup"
-fi
+echo "🔍 Testing SQLite availability..."
+php -r "
+try {
+    \$pdo = new PDO('sqlite::memory:');
+    \$pdo->exec('CREATE TABLE test (id INTEGER)');
+    echo 'SUCCESS';
+} catch(Exception \$e) {
+    echo 'FAIL: ' . \$e->getMessage();
+}
+" 2>/dev/null
 
 # Check if Laravel is properly set up
 if [ ! -f .env ]; then
@@ -50,15 +73,35 @@ fi
 echo "🔑 Generating application key..."
 php artisan key:generate --force --no-interaction 2>/dev/null || echo "⚠️ Key generation failed"
 
-# Run migrations
-echo "🔄 Running database migrations..."
-if php artisan migrate --force --no-interaction 2>/dev/null; then
-    echo "✅ Migrations completed successfully"
-    php artisan db:seed --force --no-interaction 2>/dev/null || echo "⚠️ Seeding failed, continuing without seed data"
+# Test database connection before migrations
+echo "🧪 Testing database connection..."
+if php artisan tinker --execute="DB::connection()->getPdo();" 2>/dev/null; then
+    echo "✅ Database connection successful"
+
+    # Run migrations
+    echo "🔄 Running database migrations..."
+    if php artisan migrate --force --no-interaction 2>/dev/null; then
+        echo "✅ Migrations completed successfully"
+        php artisan db:seed --force --no-interaction 2>/dev/null || echo "⚠️ Seeding failed, continuing without seed data"
+    else
+        echo "❌ Database migrations failed"
+        echo "🔍 Debugging migration error..."
+        php artisan migrate --force --no-interaction 2>&1 | head -20
+    fi
 else
-    echo "❌ Database migrations failed"
-    echo "🔍 Debugging migration error..."
-    php artisan migrate --force --no-interaction 2>&1 | head -20
+    echo "❌ Database connection failed - switching to file-based sessions"
+    echo "SESSION_DRIVER=file" >> .env
+    echo "CACHE_STORE=file" >> .env
+    echo "QUEUE_CONNECTION=sync" >> .env
+
+    # Create minimal database for basic functionality
+    echo "📦 Creating minimal SQLite database..."
+    touch /tmp/minimal.sqlite
+    chmod 664 /tmp/minimal.sqlite
+    echo "DB_DATABASE=/tmp/minimal.sqlite" >> .env
+
+    # Try basic migration
+    php artisan migrate --force --no-interaction 2>/dev/null || echo "⚠️ Even minimal migration failed"
 fi
 
 # Clear caches to prevent 500 errors (critical for NPM builds)
@@ -135,15 +178,44 @@ echo "Database exists: $([ -f /tmp/database.sqlite ] && echo "✅ Yes" || echo "
 # Show PHP version and extensions
 echo "📋 PHP Information:"
 php -v | head -1
-echo "SQLite extension: $(php -m | grep -q sqlite3 && echo "✅ Available" || echo "❌ Missing")"
+echo "Available extensions: $(php -m | grep -E '(sqlite|pdo)' | wc -l) SQLite/PDO extensions"
+echo "SQLite3: $(php -m | grep -q sqlite3 && echo "✅ Available" || echo "❌ Missing")"
+echo "PDO SQLite: $(php -m | grep -q pdo_sqlite && echo "✅ Available" || echo "❌ Missing")"
+echo "PDO: $(php -m | grep -q pdo && echo "✅ Available" || echo "❌ Missing")"
 
-# Final test
-echo "🧪 Final application test..."
+# Show PHP configuration
+echo "📋 PHP Configuration:"
+php --ini | head -5
+
+# Final comprehensive test
+echo "🧪 Final comprehensive test..."
+echo "Testing PDO SQLite directly:"
+php -r "
+try {
+    \$pdo = new PDO('sqlite:/tmp/database.sqlite');
+    \$pdo->exec('CREATE TABLE IF NOT EXISTS test_table (id INTEGER PRIMARY KEY)');
+    echo '✅ PDO SQLite working';
+} catch(Exception \$e) {
+    echo '❌ PDO SQLite failed: ' . \$e->getMessage();
+}
+" 2>/dev/null
+
+echo "Testing Laravel artisan:"
 if php artisan --version 2>/dev/null; then
     echo "✅ Laravel is working correctly"
 else
     echo "❌ Laravel test failed"
 fi
+
+echo "Testing database connection via Laravel:"
+php artisan tinker --execute="
+try {
+    DB::connection()->getPdo();
+    echo 'SUCCESS';
+} catch(Exception \$e) {
+    echo 'FAIL: ' . \$e->getMessage();
+}
+" 2>/dev/null
 
 # Start Laravel server
 echo "🚀 Starting Laravel server on port $PORT..."
