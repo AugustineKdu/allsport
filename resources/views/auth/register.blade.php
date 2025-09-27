@@ -4,7 +4,7 @@
         <p class="text-sm text-gray-600">새 계정을 만드세요</p>
     </div>
 
-    <form method="POST" action="{{ route('register') }}">
+    <form method="POST" action="{{ route('register') }}" autocomplete="on" novalidate>
         @csrf
 
         <!-- Name -->

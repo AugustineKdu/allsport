@@ -8,11 +8,11 @@ options:
     - name: APP_NAME
       value: "AllSports"
     - name: APP_ENV
-      value: local
+      value: production
     - name: APP_KEY
       value: base64:SsWtZfj/IW0uDbw5r0aGQSd0CB58kUay7aMg/KdvQ5o=
     - name: APP_DEBUG
-      value: "true"
+      value: "false"
     - name: VITE_ENABLED
       value: "false"
     - name: SESSION_SECURE_COOKIE
@@ -47,6 +47,10 @@ options:
       value: errorlog
     - name: LOG_LEVEL
       value: error
+    - name: FORCE_HTTPS
+      value: "true"
+    - name: SECURE_HEADERS
+      value: "true"
   buildenv: []
   prestart: ""
   start: bash start.sh

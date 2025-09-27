@@ -18,7 +18,7 @@
         <p class="text-sm text-gray-600">계정에 로그인하세요</p>
     </div>
 
-    <form method="POST" action="{{ route('login') }}">
+    <form method="POST" action="{{ route('login') }}" autocomplete="on" novalidate>
         @csrf
 
         <!-- Email Address -->
@@ -31,7 +31,8 @@
                    value="{{ old('email') }}"
                    required
                    autofocus
-                   autocomplete="username"
+                   autocomplete="email"
+                   spellcheck="false"
                    placeholder="이메일을 입력하세요">
             @error('email')
                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -47,6 +48,7 @@
                    name="password"
                    required
                    autocomplete="current-password"
+                   spellcheck="false"
                    placeholder="비밀번호를 입력하세요">
             @error('password')
                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
