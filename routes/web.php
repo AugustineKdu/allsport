@@ -7,6 +7,7 @@ use App\Http\Controllers\MatchController;
 use App\Http\Controllers\RankingController;
 use App\Http\Controllers\Admin\RegionController as AdminRegionController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 Route::get('/', function () {
     return auth()->check() ? redirect()->route('home') : view('welcome');
@@ -80,5 +81,12 @@ Route::middleware(['auth'])->group(function () {
         })->name('dashboard');
     });
 });
+
+// CSRF token refresh route
+Route::get('/csrf-token', function (Request $request) {
+    return response()->json([
+        'csrf_token' => csrf_token()
+    ]);
+})->name('csrf.token');
 
 require __DIR__.'/auth.php';

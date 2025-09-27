@@ -2,8 +2,9 @@
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <form method="POST" action="{{ route('login') }}">
+    <form method="POST" action="{{ route('login') }}" id="login-form">
         @csrf
+        <input type="hidden" name="_token" id="csrf-token" value="{{ csrf_token() }}">
 
         <!-- Email Address -->
         <div>
@@ -44,4 +45,82 @@
             </x-primary-button>
         </div>
     </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('login-form');
+            const csrfToken = document.getElementById('csrf-token');
+
+            // Refresh CSRF token periodically
+            setInterval(function() {
+                fetch('/csrf-token', {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.csrf_token) {
+                        csrfToken.value = data.csrf_token;
+                        // Update meta tag too
+                        const metaTag = document.querySelector('meta[name="csrf-token"]');
+                        if (metaTag) {
+                            metaTag.setAttribute('content', data.csrf_token);
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.log('CSRF token refresh failed:', error);
+                });
+            }, 300000); // Refresh every 5 minutes
+
+            // Handle form submission with retry on CSRF error
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const formData = new FormData(form);
+
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    if (response.status === 419) {
+                        // CSRF token expired, refresh and retry
+                        return fetch('/csrf-token')
+                            .then(res => res.json())
+                            .then(data => {
+                                csrfToken.value = data.csrf_token;
+                                formData.set('_token', data.csrf_token);
+                                return fetch(form.action, {
+                                    method: 'POST',
+                                    body: formData,
+                                    headers: {
+                                        'X-Requested-With': 'XMLHttpRequest'
+                                    }
+                                });
+                            });
+                    }
+                    return response;
+                })
+                .then(response => {
+                    if (response.redirected) {
+                        window.location.href = response.url;
+                    } else if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Fallback: submit form normally
+                    form.submit();
+                });
+            });
+        });
+    </script>
 </x-guest-layout>

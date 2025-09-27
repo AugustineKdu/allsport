@@ -8,7 +8,7 @@ options:
     - name: APP_NAME
       value: "AllSports"
     - name: APP_ENV
-      value: production
+      value: local
     - name: APP_KEY
       value: base64:SsWtZfj/IW0uDbw5r0aGQSd0CB58kUay7aMg/KdvQ5o=
     - name: APP_DEBUG
@@ -18,7 +18,11 @@ options:
     - name: SESSION_SECURE_COOKIE
       value: "false"
     - name: SESSION_SAME_SITE
-      value: "lax"
+      value: "none"
+    - name: CSRF_COOKIE_SECURE
+      value: "false"
+    - name: SESSION_LIFETIME
+      value: "720"
     - name: SANCTUM_STATEFUL_DOMAINS
       value: "port-9000-allsport-m10pz2kw69fd7f89.sel4.cloudtype.app"
     - name: SESSION_COOKIE
