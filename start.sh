@@ -3,28 +3,28 @@
 # CloudType Start Script (for NPM Build)
 echo "🎯 Starting AllSports application..."
 
-# Install SQLite PHP extension if not present
-echo "🔧 Installing SQLite PHP extension..."
-if ! php -m | grep -q sqlite3; then
-    echo "📦 Installing SQLite3 extension..."
-    # Try different methods to install SQLite
+# Install MySQL PHP extension if not present
+echo "🔧 Installing MySQL PHP extension..."
+if ! php -m | grep -q mysql; then
+    echo "📦 Installing MySQL extension..."
+    # Try different methods to install MySQL
     apt-get update -qq 2>/dev/null || true
-    apt-get install -y php-sqlite3 2>/dev/null || true
-    apt-get install -y sqlite3 2>/dev/null || true
+    apt-get install -y php-mysql 2>/dev/null || true
+    apt-get install -y php-pdo 2>/dev/null || true
 
     # Enable extension if available
-    echo "extension=sqlite3" >> /usr/local/etc/php/conf.d/sqlite.ini 2>/dev/null || true
-    echo "extension=pdo_sqlite" >> /usr/local/etc/php/conf.d/sqlite.ini 2>/dev/null || true
+    echo "extension=mysql" >> /usr/local/etc/php/conf.d/mysql.ini 2>/dev/null || true
+    echo "extension=pdo_mysql" >> /usr/local/etc/php/conf.d/mysql.ini 2>/dev/null || true
 else
-    echo "✅ SQLite3 extension already available"
+    echo "✅ MySQL extension already available"
 fi
 
-# Verify SQLite is working
-echo "🔍 Verifying SQLite availability..."
-if php -r "new PDO('sqlite::memory:');" 2>/dev/null; then
-    echo "✅ SQLite PDO working correctly"
+# Verify MySQL is working
+echo "🔍 Verifying MySQL availability..."
+if php -r "new PDO('mysql:host=localhost;dbname=test', 'root', '');" 2>/dev/null; then
+    echo "✅ MySQL PDO working correctly"
 else
-    echo "⚠️ SQLite PDO not working, will try alternative setup"
+    echo "⚠️ MySQL PDO not working, will try alternative setup"
 fi
 
 # Check if Laravel is properly set up
@@ -34,20 +34,35 @@ if [ ! -f .env ]; then
     php artisan key:generate --force
 fi
 
-# Ensure database exists and is properly set up
-if [ ! -f database/database.sqlite ]; then
-    echo "⚠️ Database not found, creating and setting up..."
-    touch database/database.sqlite
-    chmod 664 database/database.sqlite 2>/dev/null || true
+# Set MySQL environment variables for production
+echo "🔧 Setting up MySQL configuration..."
+if ! grep -q "DB_CONNECTION=mysql" .env; then
+    echo "DB_CONNECTION=mysql" >> .env
+    echo "DB_HOST=localhost" >> .env
+    echo "DB_PORT=3306" >> .env
+    echo "DB_DATABASE=allsports" >> .env
+    echo "DB_USERNAME=root" >> .env
+    echo "DB_PASSWORD=" >> .env
+    echo "APP_NAME=AllSports" >> .env
+    echo "APP_ENV=production" >> .env
+    echo "APP_DEBUG=false" >> .env
+fi
 
-    # Try to run migrations, but don't fail if SQLite driver is missing
-    echo "🔄 Attempting database migrations..."
-    if php artisan migrate --force 2>/dev/null; then
-        echo "✅ Migrations completed successfully"
-        php artisan db:seed --force 2>/dev/null || echo "⚠️ Seeding failed, continuing without seed data"
-    else
-        echo "⚠️ Database migrations failed (possibly missing SQLite driver), continuing with file-based sessions"
-    fi
+# Create MySQL database if it doesn't exist
+echo "🔄 Setting up MySQL database..."
+if mysql -u root -e "CREATE DATABASE IF NOT EXISTS allsports CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" 2>/dev/null; then
+    echo "✅ MySQL database created/verified"
+else
+    echo "⚠️ Could not create MySQL database, continuing with existing setup"
+fi
+
+# Try to run migrations
+echo "🔄 Attempting database migrations..."
+if php artisan migrate --force 2>/dev/null; then
+    echo "✅ Migrations completed successfully"
+    php artisan db:seed --force 2>/dev/null || echo "⚠️ Seeding failed, continuing without seed data"
+else
+    echo "⚠️ Database migrations failed, continuing with file-based sessions"
 fi
 
 # Clear caches to prevent 500 errors (critical for NPM builds)
@@ -98,12 +113,11 @@ mkdir -p bootstrap/cache 2>/dev/null || true
 # Final permission check
 echo "🔒 Setting final permissions..."
 chmod -R 755 storage bootstrap/cache 2>/dev/null || true
-chmod 664 database/database.sqlite 2>/dev/null || true
 
 # Verify setup
 echo "✅ Verifying setup..."
 echo "Environment file: $([ -f .env ] && echo "✅ Found" || echo "❌ Missing")"
-echo "Database file: $([ -f database/database.sqlite ] && echo "✅ Found" || echo "❌ Missing")"
+echo "Database connection: $(grep "DB_CONNECTION=mysql" .env > /dev/null && echo "✅ MySQL" || echo "❌ Not MySQL")"
 echo "Storage writable: $([ -w storage ] && echo "✅ Yes" || echo "❌ No")"
 
 # Start PHP built-in server for CloudType
