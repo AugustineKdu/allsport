@@ -14,18 +14,39 @@ echo "🔑 Generating application key..."
 php artisan key:generate --force
 
 # Clear any existing caches first
-echo "🧹 Clearing caches..."
+echo "🧹 Clearing all caches and config..."
 php artisan config:clear 2>/dev/null || true
 php artisan cache:clear 2>/dev/null || true
 php artisan view:clear 2>/dev/null || true
 php artisan route:clear 2>/dev/null || true
 
+# Force remove any cached config files
+echo "🔥 Force clearing cached configurations..."
+rm -f bootstrap/cache/config.php 2>/dev/null || true
+rm -f bootstrap/cache/packages.php 2>/dev/null || true
+rm -f bootstrap/cache/services.php 2>/dev/null || true
+
 # Setup database
 echo "🗄️ Setting up MySQL database..."
+
+# Remove any SQLite database files
+echo "🗑️ Removing SQLite files if they exist..."
+rm -f database/database.sqlite 2>/dev/null || true
+rm -f database/*.sqlite 2>/dev/null || true
+
+# Force MySQL connection environment
+echo "🔧 Setting MySQL environment variables..."
+export DB_CONNECTION=mysql
+export DB_HOST=mysql
+export DB_PORT=3306
+export DB_DATABASE=allsports
+export DB_USERNAME=root
+export DB_PASSWORD=password
+
 # Wait for MySQL to be ready
 echo "⏳ Waiting for MySQL to be ready..."
 for i in {1..30}; do
-    if php artisan tinker --execute="DB::connection()->getPdo();" 2>/dev/null; then
+    if php artisan migrate:status 2>/dev/null | grep -q "Migration"; then
         echo "✅ MySQL connection successful!"
         break
     fi
