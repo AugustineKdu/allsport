@@ -33,17 +33,37 @@ php artisan cache:clear 2>/dev/null || true
 php artisan view:clear 2>/dev/null || true
 php artisan route:clear 2>/dev/null || true
 
+# Ensure build directory and manifest exist to prevent Vite errors
+echo "📦 Setting up build directory..."
+mkdir -p public/build
+
+# Create a dummy manifest.json to prevent Vite errors
+if [ ! -f "public/build/manifest.json" ]; then
+    echo "📄 Creating dummy manifest.json..."
+    cat > public/build/manifest.json << 'EOF'
+{
+  "resources/css/app.css": {
+    "file": "assets/app.css",
+    "isEntry": true,
+    "src": "resources/css/app.css"
+  },
+  "resources/js/app.js": {
+    "file": "assets/app.js",
+    "isEntry": true,
+    "src": "resources/js/app.js"
+  }
+}
+EOF
+fi
+
 # Check if assets are properly built
 echo "📦 Verifying built assets..."
 if [ -d "public/build" ]; then
     echo "✅ Built assets directory exists"
     echo "Asset files: $(ls public/build/ | wc -l) files"
-    # Create a simple asset listing for debugging
-    ls -la public/build/ | head -10
+    echo "Manifest.json: $([ -f "public/build/manifest.json" ] && echo "✅ Found" || echo "❌ Missing")"
 else
     echo "⚠️ No public/build directory found"
-    echo "Looking for alternative asset locations..."
-    find public -name "*.css" -o -name "*.js" | head -5
 fi
 
 # Ensure storage directories exist and have proper permissions

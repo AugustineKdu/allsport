@@ -39,28 +39,36 @@ php artisan db:seed --force
 echo "🔒 Setting permissions..."
 chmod -R 755 storage bootstrap/cache 2>/dev/null || true
 
-# Ensure public/build directory exists and has proper assets
-echo "📦 Checking built assets..."
-if [ -d "public/build" ]; then
+# Ensure public/build directory exists and create manifest
+echo "📦 Setting up build directory and manifest..."
+mkdir -p public/build
+
+# Always create a proper manifest.json
+echo "📄 Creating manifest.json..."
+cat > public/build/manifest.json << 'EOF'
+{
+  "resources/css/app.css": {
+    "file": "assets/app.css",
+    "isEntry": true,
+    "src": "resources/css/app.css"
+  },
+  "resources/js/app.js": {
+    "file": "assets/app.js",
+    "isEntry": true,
+    "src": "resources/js/app.js"
+  }
+}
+EOF
+
+# Check if real built assets exist
+if [ -d "public/build" ] && [ "$(ls -A public/build 2>/dev/null | grep -v manifest.json)" ]; then
     echo "✅ Built assets found in public/build"
     ls -la public/build/ || true
-
-    # Check if manifest.json exists
-    if [ -f "public/build/manifest.json" ]; then
-        echo "✅ Vite manifest.json found"
-        echo "Manifest content preview:"
-        head -5 public/build/manifest.json || true
-    else
-        echo "⚠️ Vite manifest.json missing, will use fallback CSS"
-    fi
 else
-    echo "⚠️ No built assets found, will use CDN fallback"
-    echo "Creating empty public/build directory for future builds..."
-    mkdir -p public/build || true
-
-    # Create a simple manifest for compatibility
-    echo '{}' > public/build/manifest.json || true
+    echo "⚠️ Using static CDN assets instead of built files"
 fi
+
+echo "✅ Manifest.json ready: $([ -f "public/build/manifest.json" ] && echo "Found" || echo "Missing")"
 
 # Clear view cache to ensure latest compiled assets are used
 echo "🧹 Clearing view cache for asset updates..."
