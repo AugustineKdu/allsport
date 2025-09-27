@@ -26,33 +26,34 @@ rm -f bootstrap/cache/config.php 2>/dev/null || true
 rm -f bootstrap/cache/packages.php 2>/dev/null || true
 rm -f bootstrap/cache/services.php 2>/dev/null || true
 
-# Setup database
-echo "🗄️ Setting up MySQL database..."
+# Setup SQLite database
+echo "🗄️ Setting up SQLite database..."
 
-# Remove any SQLite database files
-echo "🗑️ Removing SQLite files if they exist..."
-rm -f database/database.sqlite 2>/dev/null || true
-rm -f database/*.sqlite 2>/dev/null || true
+# Ensure database directory exists with proper permissions
+mkdir -p database
+chmod 755 database
 
-# Force MySQL connection environment
-echo "🔧 Setting MySQL environment variables..."
-export DB_CONNECTION=mysql
-export DB_HOST=mysql
-export DB_PORT=3306
-export DB_DATABASE=allsports
-export DB_USERNAME=root
-export DB_PASSWORD=password
+# Create SQLite database file with proper permissions
+echo "📁 Creating SQLite database file..."
+touch database/database.sqlite
+chmod 664 database/database.sqlite
 
-# Wait for MySQL to be ready
-echo "⏳ Waiting for MySQL to be ready..."
-for i in {1..30}; do
-    if php artisan migrate:status 2>/dev/null | grep -q "Migration"; then
-        echo "✅ MySQL connection successful!"
-        break
-    fi
-    echo "⏳ Waiting for MySQL... ($i/30)"
-    sleep 2
-done
+# Verify database file was created
+if [ -f database/database.sqlite ]; then
+    echo "✅ SQLite database file created successfully"
+    ls -la database/database.sqlite
+else
+    echo "❌ Failed to create SQLite database file"
+fi
+
+# Test basic SQLite functionality
+echo "🔍 Testing SQLite functionality..."
+if sqlite3 database/database.sqlite "CREATE TABLE IF NOT EXISTS test (id INTEGER PRIMARY KEY);" 2>/dev/null; then
+    echo "✅ SQLite binary working correctly"
+    sqlite3 database/database.sqlite "DROP TABLE IF EXISTS test;" 2>/dev/null || true
+else
+    echo "⚠️ SQLite binary test failed"
+fi
 
 # Run migrations
 echo "🔄 Running database migrations..."

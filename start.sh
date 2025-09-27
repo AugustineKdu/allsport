@@ -3,6 +3,30 @@
 # CloudType Start Script (for NPM Build)
 echo "🎯 Starting AllSports application..."
 
+# Install SQLite PHP extension if not present
+echo "🔧 Installing SQLite PHP extension..."
+if ! php -m | grep -q sqlite3; then
+    echo "📦 Installing SQLite3 extension..."
+    # Try different methods to install SQLite
+    apt-get update -qq 2>/dev/null || true
+    apt-get install -y php-sqlite3 2>/dev/null || true
+    apt-get install -y sqlite3 2>/dev/null || true
+
+    # Enable extension if available
+    echo "extension=sqlite3" >> /usr/local/etc/php/conf.d/sqlite.ini 2>/dev/null || true
+    echo "extension=pdo_sqlite" >> /usr/local/etc/php/conf.d/sqlite.ini 2>/dev/null || true
+else
+    echo "✅ SQLite3 extension already available"
+fi
+
+# Verify SQLite is working
+echo "🔍 Verifying SQLite availability..."
+if php -r "new PDO('sqlite::memory:');" 2>/dev/null; then
+    echo "✅ SQLite PDO working correctly"
+else
+    echo "⚠️ SQLite PDO not working, will try alternative setup"
+fi
+
 # Check if Laravel is properly set up
 if [ ! -f .env ]; then
     echo "⚠️ .env not found, copying from example..."
