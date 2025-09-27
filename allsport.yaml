@@ -17,8 +17,16 @@ options:
       value: "false"
     - name: SESSION_SAME_SITE
       value: "lax"
+    - name: SANCTUM_STATEFUL_DOMAINS
+      value: "port-9000-allsport-m10pz2kw69fd7f89.sel4.cloudtype.app"
+    - name: SESSION_COOKIE
+      value: "laravel_session"
+    - name: ASSET_URL
+      value: "http://port-9000-allsport-m10pz2kw69fd7f89.sel4.cloudtype.app"
+    - name: MIX_ASSET_URL
+      value: "http://port-9000-allsport-m10pz2kw69fd7f89.sel4.cloudtype.app"
     - name: APP_URL
-      value: https://port-9000-allsport-m10pz2kw69fd7f89.sel4.cloudtype.app
+      value: http://port-9000-allsport-m10pz2kw69fd7f89.sel4.cloudtype.app
     - name: DB_CONNECTION
       value: sqlite
     - name: DB_DATABASE

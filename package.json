@@ -3,8 +3,9 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "vite build",
+        "build": "vite build --mode production",
         "dev": "vite",
+        "preview": "vite preview",
         "postinstall": "composer install --no-dev --optimize-autoloader --no-interaction",
         "prebuild": "php -v && composer install --no-dev --optimize-autoloader --no-interaction",
         "postbuild": "bash postbuild.sh"
