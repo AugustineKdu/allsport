@@ -61,10 +61,10 @@
                             </svg>
                         </button>
                     </div>
-                    
+
                     <form action="{{ route('matches.invite') }}" method="POST" class="space-y-4">
                         @csrf
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">상대 팀 선택</label>
                             <select name="invited_team_id" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
@@ -214,13 +214,13 @@
                                                 <div class="text-2xl font-bold text-blue-600">{{ $match->home_score ?? 0 }}</div>
                                             @endif
                                         </div>
-                                        
+
                                         <div class="text-center px-4">
                                             <div class="text-xs text-gray-500 mb-1">{{ $match->match_date->format('m/d') }}</div>
                                             <div class="text-lg font-bold text-gray-400">VS</div>
                                             <div class="text-xs text-gray-500 mt-1">{{ $match->match_time->format('H:i') }}</div>
                                         </div>
-                                        
+
                                         <div class="text-center">
                                             <div class="text-sm font-semibold text-gray-900">{{ $match->away_team_name }}</div>
                                             @if($match->status === '완료')
@@ -228,21 +228,21 @@
                                             @endif
                                         </div>
                                     </div>
-                                    
+
                                     <div class="flex items-center gap-4 text-xs text-gray-500">
                                         <span>📍 {{ $match->venue ?? $match->city . ' ' . $match->district }}</span>
                                         <span>⚽ {{ $match->sport }}</span>
-                                        <span class="px-2 py-1 rounded-full text-xs font-medium 
-                                            {{ $match->status === '완료' ? 'bg-green-100 text-green-800' : 
-                                               ($match->status === '진행중' ? 'bg-yellow-100 text-yellow-800' : 
+                                        <span class="px-2 py-1 rounded-full text-xs font-medium
+                                            {{ $match->status === '완료' ? 'bg-green-100 text-green-800' :
+                                               ($match->status === '진행중' ? 'bg-yellow-100 text-yellow-800' :
                                                 'bg-blue-100 text-blue-800') }}">
                                             {{ $match->status }}
                                         </span>
                                     </div>
                                 </div>
-                                
+
                                 <div class="flex items-center gap-2">
-                                    <a href="{{ route('matches.show', $match) }}" 
+                                    <a href="{{ route('matches.show', $match) }}"
                                        class="text-blue-600 hover:text-blue-800 text-sm font-medium">
                                         상세보기
                                     </a>
