@@ -71,6 +71,12 @@ Route::middleware(['auth'])->group(function () {
                 ->pluck('district');
         });
 
+        // Match Matching
+        Route::get('/match-matching', [App\Http\Controllers\MatchMatchingController::class, 'index'])->name('match-matching.index');
+        Route::post('/match-matching', [App\Http\Controllers\MatchMatchingController::class, 'store'])->name('match-matching.store');
+        Route::post('/match-matching/{matchRequest}/accept', [App\Http\Controllers\MatchMatchingController::class, 'accept'])->name('match-matching.accept');
+        Route::post('/match-matching/{matchRequest}/reject', [App\Http\Controllers\MatchMatchingController::class, 'reject'])->name('match-matching.reject');
+        Route::post('/match-matching/{matchRequest}/cancel', [App\Http\Controllers\MatchMatchingController::class, 'cancel'])->name('match-matching.cancel');
 
         // Rankings
         Route::get('/rankings', [RankingController::class, 'index'])->name('rankings.index');
