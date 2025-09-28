@@ -40,6 +40,10 @@
                             </span>
                         @endif
                     </a>
+                    <a href="{{ route('match-matching.index') }}" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center">
+                        <span class="text-xl mr-2">🎯</span>
+                        <span class="font-semibold">팀 매칭</span>
+                    </a>
                 @endif
                 <a href="{{ route('teams.index') }}" class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors flex items-center justify-center">
                     <span class="text-xl mr-2">🔍</span>

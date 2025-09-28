@@ -90,6 +90,7 @@ class ProfileController extends Controller
             'city' => $validated['city'],
             'district' => $validated['district'],
             'selected_sport' => $validated['selected_sport'],
+            'onboarding_done' => true, // 프로필 설정 완료로 표시
         ]);
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');

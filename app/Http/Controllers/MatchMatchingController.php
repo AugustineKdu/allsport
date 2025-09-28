@@ -2,17 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\GameMatch;
 use App\Models\MatchRequest;
 use App\Models\Team;
-use App\Models\GameMatch;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class MatchMatchingController extends Controller
 {
     /**
-     * Show the match matching page
+     * Display match matching index.
      */
     public function index()
     {
@@ -20,174 +19,193 @@ class MatchMatchingController extends Controller
         $currentTeam = $user->currentTeam();
 
         if (!$currentTeam) {
-            return redirect()->route('teams.index')->with('error', '팀에 가입해야 경기 매칭을 이용할 수 있습니다.');
+            return redirect()->route('teams.index')
+                ->with('error', '팀에 가입해야 매칭을 확인할 수 있습니다.');
         }
 
-        // Get teams in the same sport and region
-        $availableTeams = Team::where('id', '!=', $currentTeam->id)
-            ->where('sport', $currentTeam->sport)
-            ->where('city', $currentTeam->city)
-            ->where('district', $currentTeam->district)
-            ->with('owner')
-            ->get();
-
-        // Get pending requests to this team
-        $pendingRequests = MatchRequest::where('home_team_id', $currentTeam->id)
-            ->where('status', 'pending')
-            ->with(['requestingTeam', 'requestingTeam.owner'])
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        // Get requests made by this team
+        // 내 팀이 생성한 매칭 요청들 (아직 수락되지 않은 것들)
         $myRequests = MatchRequest::where('requesting_team_id', $currentTeam->id)
-            ->with(['homeTeam', 'homeTeam.owner'])
+            ->where('status', 'pending')
+            ->with(['requestedTeam'])
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('match-matching.index', compact('availableTeams', 'pendingRequests', 'myRequests'));
+        // 내 팀에게 온 매칭 요청들
+        $receivedRequests = MatchRequest::where('requested_team_id', $currentTeam->id)
+            ->where('status', 'pending')
+            ->with(['requestingTeam'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // 같은 스포츠의 다른 팀들 (매칭 요청 가능한 팀들)
+        $availableTeams = Team::where('sport', $currentTeam->sport)
+            ->where('id', '!=', $currentTeam->id)
+            ->where('is_active', true)
+            ->with(['owner'])
+            ->get();
+
+        return view('match-matching.index', compact(
+            'currentTeam',
+            'myRequests',
+            'receivedRequests',
+            'availableTeams'
+        ));
     }
 
     /**
-     * Store a new match request
+     * Store a new match request.
      */
     public function store(Request $request)
     {
         $user = Auth::user();
         $currentTeam = $user->currentTeam();
 
-        if (!$currentTeam) {
-            return back()->withErrors(['error' => '팀에 가입해야 경기 요청을 할 수 있습니다.']);
+        // 팀 오너만 매칭 요청 가능
+        if (!$currentTeam || $currentTeam->owner_user_id !== $user->id) {
+            return back()->with('error', '팀 오너만 매칭을 요청할 수 있습니다.');
         }
 
         $validated = $request->validate([
-            'home_team_id' => 'required|exists:teams,id',
-            'preferred_date' => 'required|date|after:today',
-            'preferred_time' => 'required',
+            'requested_team_id' => 'required|exists:teams,id',
+            'match_date' => 'required|date|after:today',
+            'match_time' => 'required|date_format:H:i',
+            'venue' => 'nullable|string|max:255',
             'message' => 'nullable|string|max:500',
+            'contact_phone' => 'nullable|string|max:20',
         ]);
 
-        // Check if team is requesting to itself
-        if ($validated['home_team_id'] == $currentTeam->id) {
-            return back()->withErrors(['error' => '자신의 팀에게는 경기 요청을 할 수 없습니다.']);
+        // 같은 팀에게 요청하는지 확인
+        if ($validated['requested_team_id'] == $currentTeam->id) {
+            return back()->with('error', '자신의 팀에게는 매칭을 요청할 수 없습니다.');
         }
 
-        // Check if there's already a pending request
-        $existingRequest = MatchRequest::where('home_team_id', $validated['home_team_id'])
-            ->where('requesting_team_id', $currentTeam->id)
+        // 요청받는 팀이 같은 스포츠인지 확인
+        $requestedTeam = Team::findOrFail($validated['requested_team_id']);
+        if ($requestedTeam->sport !== $currentTeam->sport) {
+            return back()->with('error', '같은 스포츠 종목의 팀에게만 매칭을 요청할 수 있습니다.');
+        }
+
+        // 이미 같은 팀에게 요청했는지 확인
+        $existingRequest = MatchRequest::where('requesting_team_id', $currentTeam->id)
+            ->where('requested_team_id', $validated['requested_team_id'])
             ->where('status', 'pending')
             ->first();
 
         if ($existingRequest) {
-            return back()->withErrors(['error' => '이미 이 팀에게 경기 요청을 보냈습니다.']);
+            return back()->with('error', '이미 이 팀에게 매칭을 요청했습니다.');
         }
 
-        $homeTeam = Team::find($validated['home_team_id']);
+        try {
+            MatchRequest::create([
+                'requesting_team_id' => $currentTeam->id,
+                'requested_team_id' => $validated['requested_team_id'],
+                'match_date' => $validated['match_date'],
+                'match_time' => $validated['match_time'],
+                'venue' => $validated['venue'],
+                'message' => $validated['message'],
+                'contact_phone' => $validated['contact_phone'] ?? $user->phone,
+                'status' => 'pending',
+            ]);
 
-        // Create match request
-        MatchRequest::create([
-            'home_team_id' => $validated['home_team_id'],
-            'requesting_team_id' => $currentTeam->id,
-            'sport' => $currentTeam->sport,
-            'city' => $currentTeam->city,
-            'district' => $currentTeam->district,
-            'preferred_date' => $validated['preferred_date'],
-            'preferred_time' => $validated['preferred_time'],
-            'message' => $validated['message'],
-        ]);
+            return back()->with('success', '매칭 요청이 전송되었습니다! 상대 팀의 응답을 기다려주세요.');
 
-        return back()->with('success', $homeTeam->team_name . ' 팀에게 경기 요청을 보냈습니다.');
+        } catch (\Exception $e) {
+            return back()->with('error', '매칭 요청 중 오류가 발생했습니다.');
+        }
     }
 
     /**
-     * Accept a match request
+     * Accept a match request.
      */
     public function accept(Request $request, MatchRequest $matchRequest)
     {
         $user = Auth::user();
         $currentTeam = $user->currentTeam();
 
-        // Check if user is the owner of the home team
-        if (!$currentTeam || $currentTeam->id != $matchRequest->home_team_id || $currentTeam->owner_user_id != $user->id) {
-            return back()->withErrors(['error' => '권한이 없습니다.']);
+        // 요청받는 팀의 오너만 수락 가능
+        if (!$currentTeam || $matchRequest->requested_team_id !== $currentTeam->id || $currentTeam->owner_user_id !== $user->id) {
+            return back()->with('error', '권한이 없습니다.');
         }
 
         if ($matchRequest->status !== 'pending') {
-            return back()->withErrors(['error' => '이미 처리된 요청입니다.']);
+            return back()->with('error', '이미 처리된 요청입니다.');
         }
 
-        DB::transaction(function () use ($matchRequest) {
-            // Update match request status
-            $matchRequest->update([
-                'status' => 'accepted',
-                'responded_at' => now(),
-            ]);
+        try {
+            // 매칭 요청을 수락
+            $matchRequest->update(['status' => 'accepted']);
 
-            // Create the actual match
+            // 실제 경기 생성
             GameMatch::create([
-                'sport' => $matchRequest->sport,
-                'city' => $matchRequest->city,
-                'district' => $matchRequest->district,
-                'home_team_id' => $matchRequest->home_team_id,
-                'away_team_id' => $matchRequest->requesting_team_id,
-                'home_team_name' => $matchRequest->homeTeam->team_name,
+                'sport' => $currentTeam->sport,
+                'city' => $currentTeam->city,
+                'district' => $currentTeam->district,
+                'home_team_id' => $currentTeam->id,
+                'home_team_name' => $currentTeam->team_name,
+                'away_team_id' => $matchRequest->requestingTeam->id,
                 'away_team_name' => $matchRequest->requestingTeam->team_name,
-                'match_date' => $matchRequest->preferred_date,
-                'match_time' => $matchRequest->preferred_time,
+                'match_date' => $matchRequest->match_date,
+                'match_time' => $matchRequest->match_time,
                 'status' => '예정',
-                'created_by' => auth()->id(),
+                'created_by' => $user->id,
             ]);
-        });
 
-        return back()->with('success', '경기 요청을 수락했습니다. 경기가 생성되었습니다.');
+            return back()->with('success', '매칭이 수락되었습니다! 경기가 일정에 추가되었습니다.');
+
+        } catch (\Exception $e) {
+            return back()->with('error', '매칭 수락 중 오류가 발생했습니다.');
+        }
     }
 
     /**
-     * Reject a match request
+     * Reject a match request.
      */
     public function reject(Request $request, MatchRequest $matchRequest)
     {
         $user = Auth::user();
         $currentTeam = $user->currentTeam();
 
-        // Check if user is the owner of the home team
-        if (!$currentTeam || $currentTeam->id != $matchRequest->home_team_id || $currentTeam->owner_user_id != $user->id) {
-            return back()->withErrors(['error' => '권한이 없습니다.']);
+        // 요청받는 팀의 오너만 거절 가능
+        if (!$currentTeam || $matchRequest->requested_team_id !== $currentTeam->id || $currentTeam->owner_user_id !== $user->id) {
+            return back()->with('error', '권한이 없습니다.');
         }
 
         if ($matchRequest->status !== 'pending') {
-            return back()->withErrors(['error' => '이미 처리된 요청입니다.']);
+            return back()->with('error', '이미 처리된 요청입니다.');
         }
 
-        $matchRequest->update([
-            'status' => 'rejected',
-            'responded_at' => now(),
-        ]);
+        try {
+            $matchRequest->update(['status' => 'rejected']);
+            return back()->with('success', '매칭 요청을 거절했습니다.');
 
-        return back()->with('success', '경기 요청을 거절했습니다.');
+        } catch (\Exception $e) {
+            return back()->with('error', '매칭 거절 중 오류가 발생했습니다.');
+        }
     }
 
     /**
-     * Cancel a match request
+     * Cancel a match request.
      */
     public function cancel(Request $request, MatchRequest $matchRequest)
     {
         $user = Auth::user();
         $currentTeam = $user->currentTeam();
 
-        // Check if user is the owner of the requesting team
-        if (!$currentTeam || $currentTeam->id != $matchRequest->requesting_team_id || $currentTeam->owner_user_id != $user->id) {
-            return back()->withErrors(['error' => '권한이 없습니다.']);
+        // 요청한 팀의 오너만 취소 가능
+        if (!$currentTeam || $matchRequest->requesting_team_id !== $currentTeam->id || $currentTeam->owner_user_id !== $user->id) {
+            return back()->with('error', '권한이 없습니다.');
         }
 
         if ($matchRequest->status !== 'pending') {
-            return back()->withErrors(['error' => '이미 처리된 요청입니다.']);
+            return back()->with('error', '이미 처리된 요청은 취소할 수 없습니다.');
         }
 
-        $matchRequest->update([
-            'status' => 'cancelled',
-            'responded_at' => now(),
-        ]);
+        try {
+            $matchRequest->update(['status' => 'cancelled']);
+            return back()->with('success', '매칭 요청을 취소했습니다.');
 
-        return back()->with('success', '경기 요청을 취소했습니다.');
+        } catch (\Exception $e) {
+            return back()->with('error', '매칭 취소 중 오류가 발생했습니다.');
+        }
     }
 }
