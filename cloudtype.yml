@@ -51,6 +51,13 @@ options:
       value: "https://port-9000-allsport-m10pz2kw69fd7f89.sel4.cloudtype.app"
     - name: MIX_ASSET_URL
       value: "https://port-9000-allsport-m10pz2kw69fd7f89.sel4.cloudtype.app"
+    # Backup & Recovery Settings
+    - name: AUTO_RESTORE_ON_DEPLOY
+      value: "false"  # 재배포 시 자동 복구 (필요시 "true"로 변경)
+    - name: BACKUP_ENABLED
+      value: "true"
+    - name: BACKUP_RETENTION_DAYS
+      value: "7"
   buildenv: []
   prestart: ""
   start: bash start.sh

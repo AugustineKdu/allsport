@@ -3,6 +3,23 @@
 # CloudType Start Script for AllSports - ULTIMATE SQLite Fix
 echo "🎯 Starting AllSports application..."
 
+# 백업/복구 스크립트 실행 권한 설정
+if [ -f "scripts/backup.sh" ]; then
+    chmod +x scripts/backup.sh
+fi
+if [ -f "scripts/restore.sh" ]; then
+    chmod +x scripts/restore.sh
+fi
+
+# 재배포 시 자동 복구 (환경 변수로 제어)
+if [ "${AUTO_RESTORE_ON_DEPLOY:-false}" = "true" ]; then
+    echo "🔄 재배포 감지 - 자동 복구 실행 중..."
+    export AUTO_RESTORE=true
+    if [ -f "scripts/restore.sh" ]; then
+        ./scripts/restore.sh latest || echo "⚠️ 자동 복구 실패, 정상 배포 계속 진행"
+    fi
+fi
+
 # CRITICAL: Force install SQLite with multiple methods
 echo "🚨 CRITICAL FIX: Installing SQLite with ALL methods..."
 
