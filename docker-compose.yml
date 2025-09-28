@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:80"
+    volumes:
+      # 데이터 영속성을 위한 볼륨 마운트
+      - allsports_database:/var/www/html/database
+      - allsports_storage:/var/www/html/storage
+      - allsports_logs:/var/www/html/storage/logs
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - DB_CONNECTION=sqlite
+      - DB_DATABASE=/var/www/html/database/database.sqlite
+    depends_on:
+      - mysql
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: allsports_password_2024
+      MYSQL_DATABASE: allsports
+      MYSQL_USER: allsports_user
+      MYSQL_PASSWORD: allsports_password_2024
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    restart: unless-stopped
+
+volumes:
+  allsports_database:
+  allsports_storage:
+  allsports_logs:
+  mysql_data:

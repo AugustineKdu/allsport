@@ -11,7 +11,8 @@
       "Bash(docker build:*)",
       "WebFetch(domain:port-9000-allsport-m10pz2kw69fd7f89.sel4.cloudtype.app)",
       "Bash(git push:*)",
-      "WebFetch(domain:docs.cloudtype.io)"
+      "WebFetch(domain:docs.cloudtype.io)",
+      "Bash(git stash:*)"
     ],
     "deny": [],
     "ask": []
