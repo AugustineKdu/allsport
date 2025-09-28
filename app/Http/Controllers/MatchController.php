@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\GameMatch;
 use App\Models\Team;
+use App\Models\MatchInvitation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -47,12 +48,29 @@ class MatchController extends Controller
                          ->orderBy('match_time', 'desc')
                          ->paginate(12);
 
-        // Get available teams for match creation
+        // Get available teams for match creation (all teams with same sport)
         $availableTeams = collect();
+        $sentInvitations = collect();
+        $receivedInvitations = collect();
+        
         if ($currentTeam) {
             $availableTeams = Team::where('sport', $currentTeam->sport)
                 ->where('id', '!=', $currentTeam->id)
                 ->with(['owner'])
+                ->get();
+
+            // Get pending invitations sent by this team
+            $sentInvitations = MatchInvitation::where('inviting_team_id', $currentTeam->id)
+                ->where('status', 'pending')
+                ->with(['invitedTeam'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            // Get pending invitations received by this team
+            $receivedInvitations = MatchInvitation::where('invited_team_id', $currentTeam->id)
+                ->where('status', 'pending')
+                ->with(['invitingTeam'])
+                ->orderBy('created_at', 'desc')
                 ->get();
         }
 
@@ -61,7 +79,7 @@ class MatchController extends Controller
         $cityOptions = GameMatch::distinct()->pluck('city')->filter()->sort()->values();
         $sportOptions = GameMatch::distinct()->pluck('sport')->filter()->sort()->values();
 
-        return view('matches.index', compact('matches', 'currentTeam', 'availableTeams', 'statusOptions', 'cityOptions', 'sportOptions'));
+        return view('matches.index', compact('matches', 'currentTeam', 'availableTeams', 'sentInvitations', 'receivedInvitations', 'statusOptions', 'cityOptions', 'sportOptions'));
     }
 
     /**
@@ -254,6 +272,154 @@ class MatchController extends Controller
             DB::rollBack();
             return back()->with('error', '경기 결과 입력 중 오류가 발생했습니다.');
         }
+    }
+
+    /**
+     * Send a match invitation.
+     */
+    public function sendInvitation(Request $request)
+    {
+        $user = Auth::user();
+        $currentTeam = $user->currentTeam();
+
+        if (!$currentTeam || $currentTeam->owner_user_id !== $user->id) {
+            return back()->with('error', '팀 오너만 경기 초대를 보낼 수 있습니다.');
+        }
+
+        $validated = $request->validate([
+            'invited_team_id' => 'required|exists:teams,id',
+            'proposed_date' => 'required|date|after:today',
+            'proposed_time' => 'required',
+            'proposed_venue' => 'required|string|max:255',
+            'message' => 'nullable|string|max:500',
+            'contact_phone' => 'nullable|string|max:20',
+        ]);
+
+        $invitedTeam = Team::findOrFail($validated['invited_team_id']);
+
+        // Check if same team
+        if ($invitedTeam->id === $currentTeam->id) {
+            return back()->with('error', '자신의 팀에게는 경기를 초대할 수 없습니다.');
+        }
+
+        // Check if same sport
+        if ($invitedTeam->sport !== $currentTeam->sport) {
+            return back()->with('error', '같은 스포츠 종목의 팀에게만 경기를 초대할 수 있습니다.');
+        }
+
+        // Check if already sent invitation
+        $existingInvitation = MatchInvitation::where('inviting_team_id', $currentTeam->id)
+            ->where('invited_team_id', $invitedTeam->id)
+            ->where('status', 'pending')
+            ->first();
+
+        if ($existingInvitation) {
+            return back()->with('error', '이미 이 팀에게 경기 초대를 보냈습니다.');
+        }
+
+        MatchInvitation::create([
+            'inviting_team_id' => $currentTeam->id,
+            'invited_team_id' => $invitedTeam->id,
+            'proposed_date' => $validated['proposed_date'],
+            'proposed_time' => $validated['proposed_time'],
+            'proposed_venue' => $validated['proposed_venue'],
+            'message' => $validated['message'],
+            'contact_phone' => $validated['contact_phone'] ?? $user->phone,
+            'status' => 'pending',
+        ]);
+
+        return back()->with('success', '경기 초대를 보냈습니다!');
+    }
+
+    /**
+     * Accept a match invitation.
+     */
+    public function acceptInvitation(MatchInvitation $invitation)
+    {
+        $user = Auth::user();
+        $currentTeam = $user->currentTeam();
+
+        if (!$currentTeam || $invitation->invited_team_id !== $currentTeam->id || $currentTeam->owner_user_id !== $user->id) {
+            return back()->with('error', '권한이 없습니다.');
+        }
+
+        if ($invitation->status !== 'pending') {
+            return back()->with('error', '이미 처리된 초대입니다.');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Accept the invitation
+            $invitation->update(['status' => 'accepted']);
+
+            // Create the match
+            GameMatch::create([
+                'sport' => $currentTeam->sport,
+                'city' => $invitation->invitingTeam->city,
+                'district' => $invitation->invitingTeam->district,
+                'home_team_id' => $invitation->inviting_team_id,
+                'home_team_name' => $invitation->invitingTeam->team_name,
+                'away_team_id' => $currentTeam->id,
+                'away_team_name' => $currentTeam->team_name,
+                'match_date' => $invitation->proposed_date,
+                'match_time' => $invitation->proposed_time,
+                'venue' => $invitation->proposed_venue,
+                'status' => '예정',
+                'notes' => $invitation->message,
+                'created_by' => $user->id,
+            ]);
+
+            DB::commit();
+
+            return back()->with('success', '경기 초대를 수락했습니다! 경기가 일정에 추가되었습니다.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', '경기 초대 수락 중 오류가 발생했습니다.');
+        }
+    }
+
+    /**
+     * Reject a match invitation.
+     */
+    public function rejectInvitation(MatchInvitation $invitation)
+    {
+        $user = Auth::user();
+        $currentTeam = $user->currentTeam();
+
+        if (!$currentTeam || $invitation->invited_team_id !== $currentTeam->id || $currentTeam->owner_user_id !== $user->id) {
+            return back()->with('error', '권한이 없습니다.');
+        }
+
+        if ($invitation->status !== 'pending') {
+            return back()->with('error', '이미 처리된 초대입니다.');
+        }
+
+        $invitation->update(['status' => 'rejected']);
+
+        return back()->with('success', '경기 초대를 거절했습니다.');
+    }
+
+    /**
+     * Cancel a match invitation.
+     */
+    public function cancelInvitation(MatchInvitation $invitation)
+    {
+        $user = Auth::user();
+        $currentTeam = $user->currentTeam();
+
+        if (!$currentTeam || $invitation->inviting_team_id !== $currentTeam->id || $currentTeam->owner_user_id !== $user->id) {
+            return back()->with('error', '권한이 없습니다.');
+        }
+
+        if ($invitation->status !== 'pending') {
+            return back()->with('error', '이미 처리된 초대입니다.');
+        }
+
+        $invitation->update(['status' => 'cancelled']);
+
+        return back()->with('success', '경기 초대를 취소했습니다.');
     }
 
 }

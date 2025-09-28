@@ -108,6 +108,22 @@ class Team extends Model
     }
 
     /**
+     * Get invitations sent by this team.
+     */
+    public function sentInvitations()
+    {
+        return $this->hasMany(MatchInvitation::class, 'inviting_team_id');
+    }
+
+    /**
+     * Get invitations received by this team.
+     */
+    public function receivedInvitations()
+    {
+        return $this->hasMany(MatchInvitation::class, 'invited_team_id');
+    }
+
+    /**
      * Get the number of online members.
      */
     public function getOnlineMembersCount()

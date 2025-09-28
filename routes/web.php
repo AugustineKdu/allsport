@@ -45,8 +45,12 @@ Route::middleware(['auth'])->group(function () {
 
         // Matches (통합된 매칭 기능 포함)
         Route::get('/matches', [MatchController::class, 'index'])->name('matches.index');
-        Route::get('/matches/create', [MatchController::class, 'create'])->name('matches.create');
-        Route::post('/matches', [MatchController::class, 'store'])->name('matches.store');
+    Route::get('/matches/create', [MatchController::class, 'create'])->name('matches.create');
+    Route::post('/matches', [MatchController::class, 'store'])->name('matches.store');
+    Route::post('/matches/invite', [MatchController::class, 'sendInvitation'])->name('matches.invite');
+    Route::post('/matches/invitations/{invitation}/accept', [MatchController::class, 'acceptInvitation'])->name('matches.invitations.accept');
+    Route::post('/matches/invitations/{invitation}/reject', [MatchController::class, 'rejectInvitation'])->name('matches.invitations.reject');
+    Route::post('/matches/invitations/{invitation}/cancel', [MatchController::class, 'cancelInvitation'])->name('matches.invitations.cancel');
         Route::get('/matches/{match}', [MatchController::class, 'show'])->name('matches.show');
         Route::get('/matches/{match}/edit-result', [MatchController::class, 'editResult'])->name('matches.edit-result');
         Route::patch('/matches/{match}/result', [MatchController::class, 'updateResult'])->name('matches.update-result');
