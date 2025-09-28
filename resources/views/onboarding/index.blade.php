@@ -311,7 +311,7 @@
             // City selection change handler
             citySelect.addEventListener('change', function() {
                 const selectedCity = this.value;
-                
+
                 if (selectedCity) {
                     // Load districts for selected city
                     fetch(`/api/regions/${selectedCity}/districts`)
@@ -319,12 +319,12 @@
                         .then(districts => {
                             // Clear existing districts
                             districtGrid.innerHTML = '';
-                            
+
                             // Add district options
                             districts.forEach(district => {
                                 const label = document.createElement('label');
                                 label.className = 'block cursor-pointer';
-                                
+
                                 label.innerHTML = `
                                     <input type="radio" name="district" value="${district}" class="sr-only district-radio">
                                     <div class="district-option bg-white/20 hover:bg-white/30 active:bg-white/40 backdrop-blur-sm rounded-xl p-3 border-2 border-white/30 text-center transition-all duration-200">
@@ -333,13 +333,13 @@
                                         <div class="text-white/80 text-xs">${selectedCity}</div>
                                     </div>
                                 `;
-                                
+
                                 districtGrid.appendChild(label);
-                                
+
                                 // Add click handler for district selection
                                 const radio = label.querySelector('.district-radio');
                                 const option = label.querySelector('.district-option');
-                                
+
                                 radio.addEventListener('change', function() {
                                     // Remove selected class from all district options
                                     document.querySelectorAll('.district-option').forEach(opt => {
@@ -359,7 +359,7 @@
                                     radio.dispatchEvent(new Event('change'));
                                 });
                             });
-                            
+
                             // Show district container
                             districtContainer.classList.remove('hidden');
                         })
@@ -405,7 +405,7 @@
 
             cityDesktopSelect.addEventListener('change', function() {
                 const selectedCity = this.value;
-                
+
                 if (selectedCity) {
                     // Load districts for selected city
                     fetch(`/api/regions/${selectedCity}/districts`)
@@ -413,12 +413,12 @@
                         .then(districts => {
                             // Clear existing districts
                             districtDesktopGrid.innerHTML = '';
-                            
+
                             // Add district options
                             districts.forEach(district => {
                                 const label = document.createElement('label');
                                 label.className = 'block cursor-pointer';
-                                
+
                                 label.innerHTML = `
                                     <input type="radio" name="district" value="${district}" class="sr-only desktop-district-radio">
                                     <div class="bg-white/20 hover:bg-white/30 active:bg-white/40 backdrop-blur-sm rounded-xl p-4 border-2 border-white/30 text-center transition-all duration-200">
@@ -427,13 +427,13 @@
                                         <div class="text-white/80 text-xs">${selectedCity}</div>
                                     </div>
                                 `;
-                                
+
                                 districtDesktopGrid.appendChild(label);
-                                
+
                                 // Add click handler for district selection
                                 const radio = label.querySelector('.desktop-district-radio');
                                 const option = label.querySelector('div');
-                                
+
                                 radio.addEventListener('change', function() {
                                     // Remove selected class from all desktop district options
                                     districtDesktopGrid.querySelectorAll('div').forEach(opt => {
@@ -453,7 +453,7 @@
                                     radio.dispatchEvent(new Event('change'));
                                 });
                             });
-                            
+
                             // Show district container
                             districtDesktopContainer.classList.remove('hidden');
                         })

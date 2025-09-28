@@ -43,12 +43,18 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/teams/{slug}/reject/{member}', [TeamController::class, 'reject'])->name('teams.reject');
         Route::post('/teams/{slug}/kick/{member}', [TeamController::class, 'kick'])->name('teams.kick');
 
-        // Matches
+        // Matches (통합된 매칭 기능 포함)
         Route::get('/matches', [MatchController::class, 'index'])->name('matches.index');
         Route::get('/matches/{match}', [MatchController::class, 'show'])->name('matches.show');
         Route::post('/matches/{match}/apply', [MatchController::class, 'apply'])->name('matches.apply');
         Route::get('/matches/{match}/edit-result', [MatchController::class, 'editResult'])->name('matches.edit-result');
         Route::patch('/matches/{match}/result', [MatchController::class, 'updateResult'])->name('matches.update-result');
+
+        // Match Request routes (통합된 매칭 기능)
+        Route::post('/matches/store-match-request', [MatchController::class, 'storeMatchRequest'])->name('matches.store-match-request');
+        Route::post('/matches/accept-match-request/{matchRequest}', [MatchController::class, 'acceptMatchRequest'])->name('matches.accept-match-request');
+        Route::post('/matches/reject-match-request/{matchRequest}', [MatchController::class, 'rejectMatchRequest'])->name('matches.reject-match-request');
+        Route::post('/matches/cancel-match-request/{matchRequest}', [MatchController::class, 'cancelMatchRequest'])->name('matches.cancel-match-request');
 
         // Region API routes
         Route::get('/api/regions/{city}/districts', function ($city) {
@@ -65,12 +71,6 @@ Route::middleware(['auth'])->group(function () {
                 ->pluck('district');
         });
 
-        // Match Matching
-        Route::get('/match-matching', [App\Http\Controllers\MatchMatchingController::class, 'index'])->name('match-matching.index');
-        Route::post('/match-matching', [App\Http\Controllers\MatchMatchingController::class, 'store'])->name('match-matching.store');
-        Route::post('/match-matching/{matchRequest}/accept', [App\Http\Controllers\MatchMatchingController::class, 'accept'])->name('match-matching.accept');
-        Route::post('/match-matching/{matchRequest}/reject', [App\Http\Controllers\MatchMatchingController::class, 'reject'])->name('match-matching.reject');
-        Route::post('/match-matching/{matchRequest}/cancel', [App\Http\Controllers\MatchMatchingController::class, 'cancel'])->name('match-matching.cancel');
 
         // Rankings
         Route::get('/rankings', [RankingController::class, 'index'])->name('rankings.index');
