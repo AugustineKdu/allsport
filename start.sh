@@ -104,8 +104,8 @@ fi
 
 # Ensure .env has correct settings
 echo "🔧 Ensuring .env configuration..."
-if ! grep -q "DB_DATABASE=/app/persistent/database.sqlite" .env; then
-    echo "DB_DATABASE=/app/persistent/database.sqlite" >> .env
+if ! grep -q "DB_DATABASE=/tmp/database.sqlite" .env; then
+    echo "DB_DATABASE=/tmp/database.sqlite" >> .env
 fi
 
 # Add HTTPS security settings

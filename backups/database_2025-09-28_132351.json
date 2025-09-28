@@ -1,0 +1,568 @@
+{
+    "users": [
+        {
+            "id": 9,
+            "name": "Developer",
+            "email": "developer@allsports.com",
+            "email_verified_at": null,
+            "password": "$2y$12$dlHCRAmyRSuxkc9c2whbg.r8xCvm01xHP0howt2TecXKe03TZAml6",
+            "remember_token": null,
+            "created_at": "2025-09-28 10:38:47",
+            "updated_at": "2025-09-28 10:38:47",
+            "nickname": "\uac1c\ubc1c\uc790",
+            "city": "\uc11c\uc6b8\ud2b9\ubcc4\uc2dc",
+            "district": "\uc1a1\ud30c\uad6c",
+            "selected_sport": "\ucd95\uad6c",
+            "onboarding_done": 1,
+            "role": "admin",
+            "phone": "010-1234-5678",
+            "show_phone_in_matching": 0
+        },
+        {
+            "id": 10,
+            "name": "Owner",
+            "email": "owner@allsports.com",
+            "email_verified_at": null,
+            "password": "$2y$12$DXJ4srE3GouZ.QMXoyvAIubutWf3fXFI5cd.TYWCiTyE4whtufFrm",
+            "remember_token": null,
+            "created_at": "2025-09-28 10:38:47",
+            "updated_at": "2025-09-28 10:38:47",
+            "nickname": "\uc624\ub108",
+            "city": "\uc11c\uc6b8\ud2b9\ubcc4\uc2dc",
+            "district": "\uc1a1\ud30c\uad6c",
+            "selected_sport": "\ucd95\uad6c",
+            "onboarding_done": 1,
+            "role": "admin",
+            "phone": "010-2345-6789",
+            "show_phone_in_matching": 0
+        }
+    ],
+    "regions": [
+        {
+            "id": 1,
+            "city": "\uc11c\uc6b8\ud2b9\ubcc4\uc2dc",
+            "district": "\uc1a1\ud30c\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 11:14:45"
+        },
+        {
+            "id": 2,
+            "city": "\uc11c\uc6b8\ud2b9\ubcc4\uc2dc",
+            "district": "\uac15\ub0a8\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 11:14:45"
+        },
+        {
+            "id": 3,
+            "city": "\uc11c\uc6b8\ud2b9\ubcc4\uc2dc",
+            "district": "\uac15\ub3d9\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 11:14:45"
+        },
+        {
+            "id": 4,
+            "city": "\uc11c\uc6b8\ud2b9\ubcc4\uc2dc",
+            "district": "\uac15\ubd81\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 11:14:45"
+        },
+        {
+            "id": 5,
+            "city": "\uc11c\uc6b8\ud2b9\ubcc4\uc2dc",
+            "district": "\uac15\uc11c\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 11:14:45"
+        },
+        {
+            "id": 6,
+            "city": "\uc11c\uc6b8\ud2b9\ubcc4\uc2dc",
+            "district": "\uad00\uc545\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 11:14:45"
+        },
+        {
+            "id": 7,
+            "city": "\uc11c\uc6b8\ud2b9\ubcc4\uc2dc",
+            "district": "\uad11\uc9c4\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 11:14:45"
+        },
+        {
+            "id": 8,
+            "city": "\uc11c\uc6b8\ud2b9\ubcc4\uc2dc",
+            "district": "\uad6c\ub85c\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 11:14:45"
+        },
+        {
+            "id": 9,
+            "city": "\uc11c\uc6b8\ud2b9\ubcc4\uc2dc",
+            "district": "\uae08\ucc9c\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 11:14:45"
+        },
+        {
+            "id": 10,
+            "city": "\uc11c\uc6b8\ud2b9\ubcc4\uc2dc",
+            "district": "\ub178\uc6d0\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 11:14:45"
+        },
+        {
+            "id": 11,
+            "city": "\uc11c\uc6b8\ud2b9\ubcc4\uc2dc",
+            "district": "\ub3c4\ubd09\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 11:14:45"
+        },
+        {
+            "id": 12,
+            "city": "\uc11c\uc6b8\ud2b9\ubcc4\uc2dc",
+            "district": "\ub3d9\ub300\ubb38\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 11:14:45"
+        },
+        {
+            "id": 13,
+            "city": "\uc11c\uc6b8\ud2b9\ubcc4\uc2dc",
+            "district": "\ub3d9\uc791\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 11:14:45"
+        },
+        {
+            "id": 14,
+            "city": "\uc11c\uc6b8\ud2b9\ubcc4\uc2dc",
+            "district": "\ub9c8\ud3ec\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 11:14:45"
+        },
+        {
+            "id": 15,
+            "city": "\uc11c\uc6b8\ud2b9\ubcc4\uc2dc",
+            "district": "\uc11c\ub300\ubb38\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 11:14:45"
+        },
+        {
+            "id": 16,
+            "city": "\uc11c\uc6b8\ud2b9\ubcc4\uc2dc",
+            "district": "\uc11c\ucd08\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 11:14:45"
+        },
+        {
+            "id": 17,
+            "city": "\uc11c\uc6b8\ud2b9\ubcc4\uc2dc",
+            "district": "\uc131\ub3d9\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 11:14:45"
+        },
+        {
+            "id": 18,
+            "city": "\uc11c\uc6b8\ud2b9\ubcc4\uc2dc",
+            "district": "\uc131\ubd81\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 11:14:45"
+        },
+        {
+            "id": 19,
+            "city": "\uc11c\uc6b8\ud2b9\ubcc4\uc2dc",
+            "district": "\uc591\ucc9c\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 11:14:45"
+        },
+        {
+            "id": 20,
+            "city": "\uc11c\uc6b8\ud2b9\ubcc4\uc2dc",
+            "district": "\uc601\ub4f1\ud3ec\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 11:14:45"
+        },
+        {
+            "id": 21,
+            "city": "\uc11c\uc6b8\ud2b9\ubcc4\uc2dc",
+            "district": "\uc6a9\uc0b0\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 11:14:45"
+        },
+        {
+            "id": 22,
+            "city": "\uc11c\uc6b8\ud2b9\ubcc4\uc2dc",
+            "district": "\uc740\ud3c9\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 11:14:45"
+        },
+        {
+            "id": 23,
+            "city": "\uc11c\uc6b8\ud2b9\ubcc4\uc2dc",
+            "district": "\uc885\ub85c\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 11:14:45"
+        },
+        {
+            "id": 24,
+            "city": "\uc11c\uc6b8\ud2b9\ubcc4\uc2dc",
+            "district": "\uc911\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 11:14:45"
+        },
+        {
+            "id": 25,
+            "city": "\uc11c\uc6b8\ud2b9\ubcc4\uc2dc",
+            "district": "\uc911\ub791\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 11:14:45"
+        },
+        {
+            "id": 26,
+            "city": "\uacbd\uae30",
+            "district": "\uc218\uc6d0\uc2dc",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 27,
+            "city": "\uacbd\uae30",
+            "district": "\uc131\ub0a8\uc2dc",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 28,
+            "city": "\uacbd\uae30",
+            "district": "\uc758\uc815\ubd80\uc2dc",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 29,
+            "city": "\uacbd\uae30",
+            "district": "\uc548\uc591\uc2dc",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 30,
+            "city": "\uacbd\uae30",
+            "district": "\ubd80\ucc9c\uc2dc",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 31,
+            "city": "\uacbd\uae30",
+            "district": "\uad11\uba85\uc2dc",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 32,
+            "city": "\uacbd\uae30",
+            "district": "\ud3c9\ud0dd\uc2dc",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 33,
+            "city": "\uacbd\uae30",
+            "district": "\uacfc\ucc9c\uc2dc",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 34,
+            "city": "\uacbd\uae30",
+            "district": "\uc624\uc0b0\uc2dc",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 35,
+            "city": "\uacbd\uae30",
+            "district": "\uc2dc\ud765\uc2dc",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 36,
+            "city": "\uacbd\uae30",
+            "district": "\uad70\ud3ec\uc2dc",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 37,
+            "city": "\uacbd\uae30",
+            "district": "\uc758\uc655\uc2dc",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 38,
+            "city": "\uacbd\uae30",
+            "district": "\ud558\ub0a8\uc2dc",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 39,
+            "city": "\uacbd\uae30",
+            "district": "\uc6a9\uc778\uc2dc",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 40,
+            "city": "\uacbd\uae30",
+            "district": "\ud30c\uc8fc\uc2dc",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 41,
+            "city": "\uacbd\uae30",
+            "district": "\uc774\ucc9c\uc2dc",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 42,
+            "city": "\uacbd\uae30",
+            "district": "\uc548\uc131\uc2dc",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 43,
+            "city": "\uacbd\uae30",
+            "district": "\uae40\ud3ec\uc2dc",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 44,
+            "city": "\uacbd\uae30",
+            "district": "\ud654\uc131\uc2dc",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 45,
+            "city": "\uacbd\uae30",
+            "district": "\uad11\uc8fc\uc2dc",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 46,
+            "city": "\uacbd\uae30",
+            "district": "\uc5ec\uc8fc\uc2dc",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 47,
+            "city": "\uc778\ucc9c",
+            "district": "\uc911\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 48,
+            "city": "\uc778\ucc9c",
+            "district": "\ub3d9\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 49,
+            "city": "\uc778\ucc9c",
+            "district": "\ubbf8\ucd94\ud640\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 50,
+            "city": "\uc778\ucc9c",
+            "district": "\uc5f0\uc218\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 51,
+            "city": "\uc778\ucc9c",
+            "district": "\ub0a8\ub3d9\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 52,
+            "city": "\uc778\ucc9c",
+            "district": "\ubd80\ud3c9\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 53,
+            "city": "\uc778\ucc9c",
+            "district": "\uacc4\uc591\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 54,
+            "city": "\uc778\ucc9c",
+            "district": "\uc11c\uad6c",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 55,
+            "city": "\uc778\ucc9c",
+            "district": "\uac15\ud654\uad70",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 56,
+            "city": "\uc778\ucc9c",
+            "district": "\uc639\uc9c4\uad70",
+            "is_active": 1,
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "id": 57,
+            "city": "\uacbd\uae30",
+            "district": "\uace0\uc591\uc2dc",
+            "is_active": 1,
+            "created_at": "2025-09-28 11:16:40",
+            "updated_at": "2025-09-28 11:16:40"
+        }
+    ],
+    "sports": [
+        {
+            "sport_name": "\ucd95\uad6c",
+            "icon": "\u26bd",
+            "is_active": 1,
+            "status": "11\uc778 \ucd95\uad6c - \ud45c\uc900 \ucd95\uad6c \uacbd\uae30",
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "sport_name": "\ud48b\uc0b4",
+            "icon": "\u26bd",
+            "is_active": 1,
+            "status": "5\uc778 \ucd95\uad6c - \uc2e4\ub0b4 \ubbf8\ub2c8 \ucd95\uad6c",
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "sport_name": "\ub18d\uad6c",
+            "icon": "\ud83c\udfc0",
+            "is_active": 0,
+            "status": "\ubca0\ud0c0 \uc11c\ube44\uc2a4 - \ucd94\ud6c4 \ucd94\uac00 \uc608\uc815",
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "sport_name": "\ubc30\uad6c",
+            "icon": "\ud83c\udfd0",
+            "is_active": 0,
+            "status": "\ubca0\ud0c0 \uc11c\ube44\uc2a4 - \ucd94\ud6c4 \ucd94\uac00 \uc608\uc815",
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "sport_name": "\uc57c\uad6c",
+            "icon": "\u26be",
+            "is_active": 0,
+            "status": "\ubca0\ud0c0 \uc11c\ube44\uc2a4 - \ucd94\ud6c4 \ucd94\uac00 \uc608\uc815",
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "sport_name": "\ud0c1\uad6c",
+            "icon": "\ud83c\udfd3",
+            "is_active": 0,
+            "status": "\ubca0\ud0c0 \uc11c\ube44\uc2a4 - \ucd94\ud6c4 \ucd94\uac00 \uc608\uc815",
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "sport_name": "\ubc30\ub4dc\ubbfc\ud134",
+            "icon": "\ud83c\udff8",
+            "is_active": 0,
+            "status": "\ubca0\ud0c0 \uc11c\ube44\uc2a4 - \ucd94\ud6c4 \ucd94\uac00 \uc608\uc815",
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        },
+        {
+            "sport_name": "\ud14c\ub2c8\uc2a4",
+            "icon": "\ud83c\udfbe",
+            "is_active": 0,
+            "status": "\ubca0\ud0c0 \uc11c\ube44\uc2a4 - \ucd94\ud6c4 \ucd94\uac00 \uc608\uc815",
+            "created_at": "2025-09-28 08:01:37",
+            "updated_at": "2025-09-28 08:01:37"
+        }
+    ],
+    "teams": [],
+    "team_members": [],
+    "matches": [],
+    "match_invitations": []
+}

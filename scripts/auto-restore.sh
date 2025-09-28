@@ -26,7 +26,7 @@ if [ -f "$PERSISTENT_DB" ]; then
     echo -e "${GREEN}✅ 사용자 데이터 복구 완료!${NC}"
 else
     echo -e "${YELLOW}⚠️  영구 저장소에 데이터베이스 없음. 백업에서 복구 시도...${NC}"
-    
+
     # Git에 저장된 백업에서 복구
     if [ -f "backups/database_latest.sqlite" ]; then
         echo -e "${GREEN}📋 백업 파일에서 복구 중...${NC}"
@@ -35,19 +35,19 @@ else
         echo -e "${GREEN}✅ 백업에서 복구 완료!${NC}"
     else
         echo -e "${YELLOW}🔄 새로운 데이터베이스 초기화...${NC}"
-        
+
         # 빈 데이터베이스 생성
         touch "$APP_DB"
-        
+
         # 마이그레이션 실행
         php artisan migrate --force
-        
+
         # 기본 시더 실행
         php artisan db:seed --force
-        
+
         # 영구 저장소에 저장
         cp "$APP_DB" "$PERSISTENT_DB"
-        
+
         echo -e "${GREEN}✅ 초기 설정 완료!${NC}"
     fi
 fi

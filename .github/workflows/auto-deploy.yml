@@ -1,0 +1,32 @@
+name: CloudType 자동 배포
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 체크아웃
+      uses: actions/checkout@v3
+
+    - name: CloudType CLI 설치
+      run: |
+        echo "📦 CloudType CLI 설치 중..."
+        npm install -g @cloudtype/cli
+
+    - name: CloudType 로그인
+      env:
+        CLOUDTYPE_TOKEN: ${{ secrets.CLOUDTYPE_TOKEN }}
+      run: |
+        echo "🔐 CloudType 로그인..."
+        cloudtype login --token ${CLOUDTYPE_TOKEN}
+
+    - name: 배포 실행
+      run: |
+        echo "🚀 배포 시작..."
+        cloudtype deploy allsport --branch main --message "자동 배포: ${{ github.event.head_commit.message }}"
+        echo "✅ 배포 완료!"
