@@ -13,6 +13,11 @@
         </div>
     @endif
 
+    <!-- 자동 배포 테스트 배너 -->
+    <div class="bg-green-500 text-white p-3 rounded-lg mb-4 text-center animate-pulse">
+        🚀 자동 배포 테스트 중! ({{ date('Y-m-d H:i:s') }})
+    </div>
+    
     <div class="text-center mb-6">
         <h2 class="text-lg font-semibold text-gray-800">로그인</h2>
         <p class="text-sm text-gray-600">계정에 로그인하세요</p>
