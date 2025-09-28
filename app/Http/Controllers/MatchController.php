@@ -101,4 +101,72 @@ class MatchController extends Controller
             return back()->withErrors(['error' => '이 경기는 이미 팀이 모두 확정되었습니다.']);
         }
     }
+
+    /**
+     * Show the form for editing match result.
+     */
+    public function editResult(GameMatch $match)
+    {
+        $user = Auth::user();
+        $currentTeam = $user->currentTeam();
+
+        // Only home team owner can edit result
+        if (!$currentTeam || $match->home_team_id !== $currentTeam->id || $currentTeam->owner_user_id !== $user->id) {
+            return back()->with('error', '경기 결과 입력 권한이 없습니다.');
+        }
+
+        // Can only edit if match is scheduled or ongoing
+        if (!in_array($match->status, ['예정', '진행중'])) {
+            return back()->with('error', '경기 결과를 입력할 수 없는 상태입니다.');
+        }
+
+        return view('matches.edit-result', compact('match'));
+    }
+
+    /**
+     * Update match result.
+     */
+    public function updateResult(Request $request, GameMatch $match)
+    {
+        $user = Auth::user();
+        $currentTeam = $user->currentTeam();
+
+        // Only home team owner can update result
+        if (!$currentTeam || $match->home_team_id !== $currentTeam->id || $currentTeam->owner_user_id !== $user->id) {
+            return back()->with('error', '경기 결과 입력 권한이 없습니다.');
+        }
+
+        $validated = $request->validate([
+            'home_score' => 'required|integer|min:0',
+            'away_score' => 'required|integer|min:0',
+            'status' => 'required|in:진행중,완료,취소',
+            'notes' => 'nullable|string|max:500',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // Update match with result
+            $match->update([
+                'home_score' => $validated['home_score'],
+                'away_score' => $validated['away_score'],
+                'status' => $validated['status'],
+                'notes' => $validated['notes'] ?? null,
+            ]);
+
+            // If match is completed, finalize it (this will update team points)
+            if ($validated['status'] === '완료') {
+                $match->finalizeMatch();
+            }
+
+            DB::commit();
+
+            return redirect()->route('matches.show', $match)
+                ->with('success', '경기 결과가 성공적으로 입력되었습니다!');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', '경기 결과 입력 중 오류가 발생했습니다.');
+        }
+    }
 }

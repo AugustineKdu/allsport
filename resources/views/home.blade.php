@@ -15,6 +15,21 @@
                 <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
                     안녕하세요{{ auth()->user()->nickname ? ', ' . auth()->user()->nickname . '님' : '' }}! 👋
                 </h1>
+
+                <!-- AllSports Core Values -->
+                <div class="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-2xl p-6 mb-6 border border-indigo-200">
+                    <div class="flex items-center justify-center mb-4">
+                        <span class="text-4xl mr-3">🏆</span>
+                        <h2 class="text-2xl sm:text-3xl font-bold text-indigo-900">AllSports</h2>
+                    </div>
+                    <p class="text-lg sm:text-xl font-semibold text-indigo-800 mb-3">
+                        지역을 대표하고 전국을 제패하라
+                    </p>
+                    <p class="text-base sm:text-lg text-indigo-700">
+                        랭킹과 기록이 만들어가는 나와 팀의 성장스토리
+                    </p>
+                </div>
+
                 <p class="text-lg text-gray-600">스포츠를 즐기고 새로운 친구들을 만나보세요</p>
             </div>
 

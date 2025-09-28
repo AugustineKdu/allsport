@@ -5,27 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <!-- PWA Meta Tags -->
-        <meta name="application-name" content="AllSports">
-        <meta name="apple-mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-status-bar-style" content="default">
-        <meta name="apple-mobile-web-app-title" content="AllSports">
         <meta name="description" content="아마추어 스포츠 팀을 만들고, 경기를 관리하며, 지역 랭킹을 확인하세요">
-        <meta name="format-detection" content="telephone=no">
-        <meta name="mobile-web-app-capable" content="yes">
-        <meta name="msapplication-config" content="/icons/browserconfig.xml">
-        <meta name="msapplication-TileColor" content="#4f46e5">
-        <meta name="msapplication-tap-highlight" content="no">
-        <meta name="theme-color" content="#4f46e5">
-
-        <!-- Apple Touch Icons -->
-        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
-        <link rel="apple-touch-icon" sizes="152x152" href="/icons/apple-touch-icon-152x152.png">
-        <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon-180x180.png">
-        <link rel="apple-touch-icon" sizes="167x167" href="/icons/apple-touch-icon-167x167.png">
-
-        <!-- PWA Manifest -->
-        <link rel="manifest" href="/manifest.json">
 
         <title>{{ config('app.name', 'AllSports') }}</title>
 
@@ -249,6 +229,49 @@
                     </div>
                 </header>
 
+                 <!-- Tablet Navigation -->
+                 <nav class="bg-white border-t border-gray-200 sticky bottom-0 z-30">
+                     <div class="max-w-4xl mx-auto">
+                         <div class="flex items-center justify-around py-3">
+                             <!-- 홈 -->
+                             <a href="{{ route('home') }}" class="flex flex-col items-center p-2 rounded-lg transition-all duration-200 {{ request()->routeIs('home') ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600' }}">
+                                 <span class="text-lg mb-1">🏠</span>
+                                 <span class="text-xs font-medium">홈</span>
+                             </a>
+
+                             <!-- 팀 -->
+                             <a href="{{ route('teams.index') }}" class="flex flex-col items-center p-2 rounded-lg transition-all duration-200 {{ request()->routeIs('teams.*') ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600' }}">
+                                 <span class="text-lg mb-1">👥</span>
+                                 <span class="text-xs font-medium">팀</span>
+                             </a>
+
+                             <!-- 경기 -->
+                             <a href="{{ route('matches.index') }}" class="flex flex-col items-center p-2 rounded-lg transition-all duration-200 {{ request()->routeIs('matches.*') ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600' }}">
+                                 <span class="text-lg mb-1">⚽</span>
+                                 <span class="text-xs font-medium">경기</span>
+                             </a>
+
+                             <!-- 매칭 -->
+                             <a href="{{ route('match-matching.index') }}" class="flex flex-col items-center p-2 rounded-lg transition-all duration-200 {{ request()->routeIs('match-matching.*') ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600' }}">
+                                 <span class="text-lg mb-1">🤝</span>
+                                 <span class="text-xs font-medium">매칭</span>
+                             </a>
+
+                             <!-- 랭킹 -->
+                             <a href="{{ route('rankings.index') }}" class="flex flex-col items-center p-2 rounded-lg transition-all duration-200 {{ request()->routeIs('rankings.*') ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600' }}">
+                                 <span class="text-lg mb-1">🏆</span>
+                                 <span class="text-xs font-medium">랭킹</span>
+                             </a>
+
+                             <!-- 마이페이지 -->
+                             <a href="{{ route('mypage') }}" class="flex flex-col items-center p-2 rounded-lg transition-all duration-200 {{ request()->routeIs('mypage') || request()->routeIs('profile.*') ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600' }}">
+                                 <span class="text-lg mb-1">👤</span>
+                                 <span class="text-xs font-medium">마이</span>
+                             </a>
+                         </div>
+                     </div>
+                 </nav>
+
                  <!-- Tablet Content -->
                  <main class="bg-gray-50 min-h-screen pb-24">
                     <!-- Page Heading -->
@@ -292,50 +315,5 @@
         @stack('scripts')
 
         <!-- PWA Scripts -->
-        <script>
-            // Service Worker 등록
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('/sw.js')
-                        .then((registration) => {
-                            console.log('SW registered: ', registration);
-
-                            // 업데이트 확인
-                            registration.addEventListener('updatefound', () => {
-                                const newWorker = registration.installing;
-                                newWorker.addEventListener('statechange', () => {
-                                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                        // 새 버전이 설치되었을 때 사용자에게 알림
-                                        if (confirm('새 버전이 사용 가능합니다. 지금 업데이트하시겠습니까?')) {
-                                            window.location.reload();
-                                        }
-                                    }
-                                });
-                            });
-                        })
-                        .catch((registrationError) => {
-                            console.log('SW registration failed: ', registrationError);
-                        });
-                });
-            }
-
-            // PWA 설치 상태 확인
-            window.addEventListener('load', () => {
-                // PWA가 설치되어 있는지 확인
-                if (window.matchMedia('(display-mode: standalone)').matches) {
-                    document.body.classList.add('pwa-installed');
-                    console.log('PWA is installed and running in standalone mode');
-                }
-
-                // iOS Safari에서 standalone 모드 확인
-                if (window.navigator.standalone === true) {
-                    document.body.classList.add('pwa-installed');
-                    console.log('PWA is installed on iOS');
-                }
-            });
-        </script>
-
-        <!-- PWA Install Prompt -->
-        <script src="{{ asset('js/pwa-install-prompt.js') }}"></script>
     </body>
 </html>

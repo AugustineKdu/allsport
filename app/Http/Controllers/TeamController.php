@@ -91,21 +91,15 @@ class TeamController extends Controller
                 ->with('error', '이미 팀을 소유하고 있습니다.');
         }
 
-        // Get cities from database and convert to standard names for display
-        $dbCities = Region::active()
-            ->select('city')
-            ->distinct()
+        // Get all regions for selection
+        $regions = Region::active()
             ->orderBy('city')
-            ->pluck('city');
-
-        // Convert to standard region names for display
-        $cities = $dbCities->map(function($city) {
-            return RegionHelper::databaseToStandard($city);
-        })->unique()->sort()->values();
+            ->orderBy('district')
+            ->get();
 
         $sports = Sport::active()->get();
 
-        return view('teams.create', compact('cities', 'sports'));
+        return view('teams.create', compact('regions', 'sports'));
     }
 
     /**
@@ -115,21 +109,16 @@ class TeamController extends Controller
     {
         $validated = $request->validate([
             'team_name' => 'required|string|max:50',
-            'city' => 'required|string',
-            'district' => 'required|string',
+            'district' => 'required|string|exists:regions,district',
             'sport' => 'required|string|exists:sports,sport_name',
         ]);
 
-        // Convert standard region name to database name
-        $dbCity = RegionHelper::standardToDatabase($validated['city']);
-
-        // Verify city and district combination
-        $regionExists = Region::where('city', $dbCity)
-            ->where('district', $validated['district'])
+        // Find the selected region to get the city
+        $region = Region::where('district', $validated['district'])
             ->where('is_active', true)
-            ->exists();
+            ->first();
 
-        if (!$regionExists) {
+        if (!$region) {
             return back()->withErrors(['district' => '선택하신 지역이 유효하지 않습니다.']);
         }
 
@@ -138,7 +127,7 @@ class TeamController extends Controller
         try {
             $team = Team::create([
                 'team_name' => $validated['team_name'],
-                'city' => $dbCity, // Save database name
+                'city' => $region->city,
                 'district' => $validated['district'],
                 'sport' => $validated['sport'],
                 'owner_user_id' => Auth::id(),

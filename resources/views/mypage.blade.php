@@ -33,6 +33,10 @@
                                 <span class="text-gray-900 font-semibold">{{ $user->city }} {{ $user->district }}</span>
                             </div>
                             <div class="flex items-center justify-between">
+                                <span class="text-gray-600">📞 전화번호</span>
+                                <span class="text-gray-900 font-semibold">{{ $user->phone ?? '미등록' }}</span>
+                            </div>
+                            <div class="flex items-center justify-between">
                                 <span class="text-gray-600">
                                     @if($user->selected_sport == '축구') ⚽
                                     @elseif($user->selected_sport == '풋살') 🥅
@@ -71,13 +75,6 @@
                                 </div>
                                 <span class="text-gray-400">→</span>
                             </a>
-                            <button onclick="showPWAInstallPrompt()" class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-300">
-                                <div class="flex items-center">
-                                    <span class="text-gray-700 mr-3">📱</span>
-                                    <span class="text-black font-semibold text-base">앱으로 설치하기</span>
-                                </div>
-                                <span class="text-gray-400">→</span>
-                            </button>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit" class="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-300">

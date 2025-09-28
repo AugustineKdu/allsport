@@ -94,6 +94,28 @@
                         </div>
                     </div>
 
+                    <!-- Result Input Button (for home team owner) -->
+                    @php
+                        $currentTeam = auth()->user()->currentTeam();
+                        $isHomeTeamOwner = $currentTeam &&
+                                          $currentTeam->id === $match->home_team_id &&
+                                          $currentTeam->owner_user_id === auth()->id();
+                        $canInputResult = $isHomeTeamOwner && in_array($match->status, ['예정', '진행중']);
+                    @endphp
+
+                    @if($canInputResult)
+                        <div class="mt-6 text-center">
+                            <a href="{{ route('matches.edit-result', $match) }}"
+                               class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-lg">
+                                <span class="mr-2">📊</span>
+                                경기 결과 입력
+                            </a>
+                            <p class="text-sm text-gray-600 mt-2">
+                                홈팀 오너만 경기 결과를 입력할 수 있습니다
+                            </p>
+                        </div>
+                    @endif
+
                     <!-- Score (if completed) -->
                     @if($match->status === '완료' && $match->home_score !== null && $match->away_score !== null)
                         <div class="mt-8 text-center">

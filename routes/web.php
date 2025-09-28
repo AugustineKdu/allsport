@@ -13,18 +13,6 @@ Route::get('/', function () {
     return auth()->check() ? redirect()->route('home') : view('welcome');
 });
 
-// PWA Routes
-Route::get('/manifest.json', function () {
-    return response()->file(public_path('manifest.json'));
-});
-
-Route::get('/sw.js', function () {
-    return response()->file(public_path('sw.js'))->header('Content-Type', 'application/javascript');
-});
-
-Route::get('/offline', function () {
-    return response()->file(public_path('offline.html'));
-});
 
 // Public API endpoints (no auth required)
 Route::get('/api/regions/{city}/districts', [OnboardingController::class, 'getDistricts']);
@@ -59,6 +47,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/matches', [MatchController::class, 'index'])->name('matches.index');
         Route::get('/matches/{match}', [MatchController::class, 'show'])->name('matches.show');
         Route::post('/matches/{match}/apply', [MatchController::class, 'apply'])->name('matches.apply');
+        Route::get('/matches/{match}/edit-result', [MatchController::class, 'editResult'])->name('matches.edit-result');
+        Route::patch('/matches/{match}/result', [MatchController::class, 'updateResult'])->name('matches.update-result');
 
         // Match Matching
         Route::get('/match-matching', [App\Http\Controllers\MatchMatchingController::class, 'index'])->name('match-matching.index');

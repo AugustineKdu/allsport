@@ -39,49 +39,22 @@
                                 </p>
                             </div>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                <div>
-                                    <label for="city" class="block text-lg font-bold text-gray-900 mb-3">
-                                        🏙️ 시/도 <span class="text-red-500 text-xl">*</span>
+                            <div class="grid grid-cols-2 gap-3 max-h-60 overflow-y-auto border border-gray-200 rounded-lg p-4">
+                                @foreach($regions as $region)
+                                    <label class="block cursor-pointer">
+                                        <input type="radio" name="district" value="{{ $region->district }}" class="sr-only team-region-radio" {{ old('district', auth()->user()->district) == $region->district ? 'checked' : '' }}>
+                                        <div class="team-region-option bg-white hover:bg-blue-50 active:bg-blue-100 border-2 border-gray-200 hover:border-blue-300 rounded-lg p-3 text-center transition-all duration-200">
+                                            <div class="text-2xl mb-2">🏢</div>
+                                            <div class="text-gray-900 font-bold text-sm mb-1">{{ $region->district }}</div>
+                                            <div class="text-gray-600 text-xs">{{ $region->city }}</div>
+                                        </div>
                                     </label>
-                                    <select name="city" id="city"
-                                            class="w-full rounded-lg border-3 border-gray-300 shadow-lg focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-4 px-5 text-lg font-semibold hover:border-blue-400 transition-colors"
-                                            required>
-                                        <option value="">시/도를 선택하세요</option>
-                                        @foreach($cities as $city)
-                                            <option value="{{ $city }}" {{ old('city', auth()->user()->city) == $city ? 'selected' : '' }}>
-                                                {{ $city }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('city')
-                                        <p class="mt-2 text-sm text-red-600 font-medium">{{ $message }}</p>
-                                    @enderror
-                                </div>
-
-                                <div>
-                                    <label for="district" class="block text-lg font-bold text-gray-900 mb-3">
-                                        🏘️ 구/군 <span class="text-red-500 text-xl">*</span>
-                                    </label>
-                                    <select name="district" id="district"
-                                            class="w-full rounded-lg border-3 border-gray-300 shadow-lg focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 py-4 px-5 text-lg font-semibold hover:border-blue-400 transition-colors"
-                                            required disabled>
-                                        <option value="">먼저 시/도를 선택하세요</option>
-                                    </select>
-                                    @error('district')
-                                        <p class="mt-2 text-sm text-red-600 font-medium">{{ $message }}</p>
-                                    @enderror
-                                </div>
+                                @endforeach
                             </div>
-
-                            <div id="region-status" class="mt-3 text-sm text-gray-600 hidden">
-                                <span class="inline-flex items-center">
-                                    <svg class="w-4 h-4 mr-1 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                                    </svg>
-                                    지역 선택 완료
-                                </span>
-                            </div>
+                            <input type="hidden" name="city" value="{{ old('city', auth()->user()->city) }}" id="team_city_hidden">
+                            @error('district')
+                                <p class="mt-2 text-sm text-red-600 font-medium">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <!-- Sport Selection -->
@@ -188,53 +161,47 @@
     @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const citySelect = document.getElementById('city');
-            const districtSelect = document.getElementById('district');
+            const cityHidden = document.getElementById('team_city_hidden');
             const currentDistrict = "{{ old('district', auth()->user()->district) }}";
 
-            // Load districts when city is pre-selected
-            if (citySelect.value) {
-                loadDistricts(citySelect.value);
-            }
+            // Team region selection
+            const teamRegionRadios = document.querySelectorAll('.team-region-radio');
+            teamRegionRadios.forEach(radio => {
+                const option = radio.parentElement.querySelector('.team-region-option');
 
-            citySelect.addEventListener('change', function() {
-                const city = this.value;
-                loadDistricts(city);
-            });
+                radio.addEventListener('change', function() {
+                    // Remove selected class from all team region options
+                    document.querySelectorAll('.team-region-option').forEach(opt => {
+                        opt.classList.remove('border-blue-500', 'bg-blue-100');
+                        opt.classList.add('border-gray-200', 'bg-white');
+                    });
 
-            function loadDistricts(city) {
-                if (city) {
-                    districtSelect.innerHTML = '<option value="">로딩 중...</option>';
-                    districtSelect.disabled = true;
+                    // Add selected class to current option
+                    if (this.checked) {
+                        option.classList.remove('border-gray-200', 'bg-white');
+                        option.classList.add('border-blue-500', 'bg-blue-100');
 
-                    fetch(`/api/teams/regions/${city}/districts`)
-                        .then(response => {
-                            console.log('API Response status:', response.status);
-                            return response.json();
-                        })
-                        .then(districts => {
-                            console.log('Districts loaded:', districts);
-                            districtSelect.innerHTML = '<option value="">구/군을 선택하세요</option>';
-                            districts.forEach(district => {
-                                const option = document.createElement('option');
-                                option.value = district;
-                                option.textContent = district;
-                                if (district === currentDistrict) {
-                                    option.selected = true;
-                                }
-                                districtSelect.appendChild(option);
-                            });
-                            districtSelect.disabled = false;
-                        })
-                        .catch(error => {
-                            console.error('Error fetching districts:', error);
-                            districtSelect.innerHTML = '<option value="">오류가 발생했습니다</option>';
-                        });
-                } else {
-                    districtSelect.innerHTML = '<option value="">먼저 시/도를 선택하세요</option>';
-                    districtSelect.disabled = true;
+                        // Update hidden city field with the city of selected district
+                        const cityText = option.querySelector('.text-gray-600').textContent;
+                        cityHidden.value = cityText;
+                    }
+                });
+
+                // Apply initial styling if already selected
+                if (radio.checked) {
+                    option.classList.remove('border-gray-200', 'bg-white');
+                    option.classList.add('border-blue-500', 'bg-blue-100');
+
+                    // Set initial city value
+                    const cityText = option.querySelector('.text-gray-600').textContent;
+                    cityHidden.value = cityText;
                 }
-            }
+
+                option.addEventListener('click', function() {
+                    radio.checked = true;
+                    radio.dispatchEvent(new Event('change'));
+                });
+            });
 
             // Handle sport selection with button clicks
             const sportOptions = document.querySelectorAll('.sport-option');
