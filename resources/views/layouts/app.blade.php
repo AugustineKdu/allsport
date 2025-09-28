@@ -150,7 +150,7 @@
 
                  <!-- Mobile Content -->
                  <main class="pb-32 bg-gray-50 min-h-screen">
-                     {{ $slot }}
+                     @yield('content')
                  </main>
 
                  <!-- Mobile Bottom Navigation -->
@@ -252,16 +252,16 @@
                  <!-- Tablet Content -->
                  <main class="bg-gray-50 min-h-screen pb-24">
                     <!-- Page Heading -->
-                    @isset($header)
+                    @hasSection('header')
                         <div class="bg-white/50 backdrop-blur-sm border-b border-gray-200">
                             <div class="max-w-4xl mx-auto py-6 px-4">
-                                {{ $header }}
+                                @yield('header')
                             </div>
                         </div>
-                    @endisset
+                    @endif
 
                     <div class="max-w-4xl mx-auto px-4 py-6">
-                        {{ $slot }}
+                        @yield('content')
                     </div>
                 </main>
             </div>
@@ -271,18 +271,18 @@
             @include('layouts.navigation')
 
             <!-- Page Heading -->
-            @isset($header)
+            @hasSection('header')
                     <header class="bg-white/50 backdrop-blur-sm shadow-sm border-b border-gray-200">
                     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
+                        @yield('header')
                     </div>
                 </header>
-            @endisset
+            @endif
 
                  <!-- Desktop Content -->
                  <main class="bg-gray-50 min-h-screen">
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {{ $slot }}
+                @yield('content')
                     </div>
             </main>
             </div>

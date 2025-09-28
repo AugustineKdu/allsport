@@ -33,6 +33,12 @@
                         </svg>
                         경기
                     </x-nav-link>
+                    <x-nav-link :href="route('match-matching.index')" :active="request()->routeIs('match-matching.*')">
+                        <svg class="w-4 h-4 mr-2 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                        </svg>
+                        매칭
+                    </x-nav-link>
                     <x-nav-link :href="route('rankings.index')" :active="request()->routeIs('rankings.*')">
                         <svg class="w-4 h-4 mr-2 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
@@ -140,6 +146,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('matches.index')" :active="request()->routeIs('matches.*')">
                 경기
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('match-matching.index')" :active="request()->routeIs('match-matching.*')">
+                매칭
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('rankings.index')" :active="request()->routeIs('rankings.*')">
                 랭킹

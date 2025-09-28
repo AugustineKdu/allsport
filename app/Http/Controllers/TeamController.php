@@ -6,6 +6,7 @@ use App\Models\Team;
 use App\Models\TeamMember;
 use App\Models\Region;
 use App\Models\Sport;
+use App\Helpers\RegionHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -22,9 +23,10 @@ class TeamController extends Controller
 
         $query = Team::with(['owner', 'approvedMembers']);
 
-        // Apply filters
+        // Apply filters with region mapping
         if ($request->filled('city')) {
-            $query->where('city', $request->city);
+            $dbCity = RegionHelper::standardToDatabase($request->city);
+            $query->where('city', $dbCity);
         }
 
         if ($request->filled('district')) {
@@ -50,15 +52,23 @@ class TeamController extends Controller
                        ->paginate(12);
 
         // Get filter options
-        $cities = Region::active()
+        // Get cities from database and convert to standard names
+        $dbCities = Region::active()
             ->select('city')
             ->distinct()
             ->orderBy('city')
             ->pluck('city');
 
+        // Convert to standard region names for display
+        $cities = $dbCities->map(function($city) {
+            return RegionHelper::databaseToStandard($city);
+        })->unique()->sort()->values();
+
+        // Handle district filtering with region mapping
+        $dbCity = $request->city ? RegionHelper::standardToDatabase($request->city) : null;
         $districts = Region::active()
-            ->when($request->city, function ($q) use ($request) {
-                return $q->where('city', $request->city);
+            ->when($dbCity, function ($q) use ($dbCity) {
+                return $q->where('city', $dbCity);
             })
             ->orderBy('district')
             ->pluck('district');
@@ -81,11 +91,17 @@ class TeamController extends Controller
                 ->with('error', '이미 팀을 소유하고 있습니다.');
         }
 
-        $cities = Region::active()
+        // Get cities from database and convert to standard names for display
+        $dbCities = Region::active()
             ->select('city')
             ->distinct()
             ->orderBy('city')
             ->pluck('city');
+
+        // Convert to standard region names for display
+        $cities = $dbCities->map(function($city) {
+            return RegionHelper::databaseToStandard($city);
+        })->unique()->sort()->values();
 
         $sports = Sport::active()->get();
 
@@ -99,13 +115,16 @@ class TeamController extends Controller
     {
         $validated = $request->validate([
             'team_name' => 'required|string|max:50',
-            'city' => 'required|string|exists:regions,city',
-            'district' => 'required|string|exists:regions,district',
+            'city' => 'required|string',
+            'district' => 'required|string',
             'sport' => 'required|string|exists:sports,sport_name',
         ]);
 
+        // Convert standard region name to database name
+        $dbCity = RegionHelper::standardToDatabase($validated['city']);
+
         // Verify city and district combination
-        $regionExists = Region::where('city', $validated['city'])
+        $regionExists = Region::where('city', $dbCity)
             ->where('district', $validated['district'])
             ->where('is_active', true)
             ->exists();
@@ -119,7 +138,7 @@ class TeamController extends Controller
         try {
             $team = Team::create([
                 'team_name' => $validated['team_name'],
-                'city' => $validated['city'],
+                'city' => $dbCity, // Save database name
                 'district' => $validated['district'],
                 'sport' => $validated['sport'],
                 'owner_user_id' => Auth::id(),
@@ -373,8 +392,11 @@ class TeamController extends Controller
      */
     public function getDistricts($city)
     {
+        // Convert standard region name to database name
+        $dbCity = RegionHelper::standardToDatabase($city);
+
         $districts = Region::active()
-            ->where('city', $city)
+            ->where('city', $dbCity)
             ->orderBy('district')
             ->pluck('district');
 
