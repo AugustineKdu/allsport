@@ -108,7 +108,7 @@ class BackupDatabase extends Command
         // Copy SQLite file as latest
         $dbPath = database_path('database.sqlite');
         $latestSqlite = $backupPath . '/database_latest.sqlite';
-        
+
         if (File::exists($dbPath)) {
             File::copy($dbPath, $latestSqlite);
         }
