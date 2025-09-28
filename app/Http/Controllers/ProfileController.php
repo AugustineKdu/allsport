@@ -67,6 +67,7 @@ class ProfileController extends Controller
     {
         $validated = $request->validate([
             'nickname' => 'required|string|max:20|unique:users,nickname,' . $request->user()->id,
+            'phone' => 'required|string|max:20',
             'city' => 'nullable|string|exists:regions,city',
             'district' => 'nullable|string|exists:regions,district',
             'selected_sport' => 'nullable|string|exists:sports,sport_name',
@@ -87,6 +88,7 @@ class ProfileController extends Controller
         $user = $request->user();
         $user->update([
             'nickname' => $validated['nickname'],
+            'phone' => $validated['phone'],
             'city' => $validated['city'],
             'district' => $validated['district'],
             'selected_sport' => $validated['selected_sport'],

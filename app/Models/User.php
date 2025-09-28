@@ -25,6 +25,7 @@ class User extends Authenticatable
         'city',
         'district',
         'selected_sport',
+        'phone',
         'onboarding_done',
         'role',
     ];

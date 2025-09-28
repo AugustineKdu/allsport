@@ -5,7 +5,7 @@
         </h2>
 
         <p class="mt-1 text-sm text-gray-600 mb-6">
-            닉네임, 지역, 선호 스포츠를 수정할 수 있습니다.
+            닉네임, 지역, 선호 스포츠, 전화번호를 수정할 수 있습니다.
         </p>
     </header>
 
@@ -23,6 +23,19 @@
                    value="{{ old('nickname', $user->nickname) }}"
                    required autofocus>
             <x-input-error class="mt-2" :messages="$errors->get('nickname')" />
+        </div>
+
+        <!-- 전화번호 -->
+        <div>
+            <label for="phone" class="block text-lg font-bold text-gray-900 mb-3">
+                📞 전화번호 <span class="text-red-500 text-xl">*</span>
+            </label>
+            <input type="tel" name="phone" id="phone"
+                   class="w-full rounded-lg border-3 border-gray-300 shadow-lg px-5 py-4 text-lg font-semibold focus:border-blue-500 focus:ring focus:ring-blue-200 hover:border-blue-400 transition-colors"
+                   value="{{ old('phone', $user->phone) }}"
+                   placeholder="예: 010-1234-5678"
+                   required>
+            <x-input-error class="mt-2" :messages="$errors->get('phone')" />
         </div>
 
         <!-- 지역 선택 -->

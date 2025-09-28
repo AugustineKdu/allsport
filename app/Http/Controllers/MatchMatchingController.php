@@ -18,31 +18,38 @@ class MatchMatchingController extends Controller
         $user = Auth::user();
         $currentTeam = $user->currentTeam();
 
-        if (!$currentTeam) {
-            return redirect()->route('teams.index')
-                ->with('error', '팀에 가입해야 매칭을 확인할 수 있습니다.');
+        // 팀이 없어도 페이지에 접근 가능
+        $myRequests = collect();
+        $receivedRequests = collect();
+        $availableTeams = collect();
+
+        if ($currentTeam) {
+            // 내 팀이 생성한 매칭 요청들 (아직 수락되지 않은 것들)
+            $myRequests = MatchRequest::where('requesting_team_id', $currentTeam->id)
+                ->where('status', 'pending')
+                ->with(['requestedTeam'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            // 내 팀에게 온 매칭 요청들
+            $receivedRequests = MatchRequest::where('requested_team_id', $currentTeam->id)
+                ->where('status', 'pending')
+                ->with(['requestingTeam'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            // 같은 스포츠의 다른 팀들 (매칭 요청 가능한 팀들) - 지역 제한 해제
+            $availableTeams = Team::where('sport', $currentTeam->sport)
+                ->where('id', '!=', $currentTeam->id)
+                ->where('is_active', true)
+                ->with(['owner'])
+                ->get();
+        } else {
+            // 팀이 없는 경우 모든 활성 팀을 표시
+            $availableTeams = Team::where('is_active', true)
+                ->with(['owner'])
+                ->get();
         }
-
-        // 내 팀이 생성한 매칭 요청들 (아직 수락되지 않은 것들)
-        $myRequests = MatchRequest::where('requesting_team_id', $currentTeam->id)
-            ->where('status', 'pending')
-            ->with(['requestedTeam'])
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        // 내 팀에게 온 매칭 요청들
-        $receivedRequests = MatchRequest::where('requested_team_id', $currentTeam->id)
-            ->where('status', 'pending')
-            ->with(['requestingTeam'])
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        // 같은 스포츠의 다른 팀들 (매칭 요청 가능한 팀들)
-        $availableTeams = Team::where('sport', $currentTeam->sport)
-            ->where('id', '!=', $currentTeam->id)
-            ->where('is_active', true)
-            ->with(['owner'])
-            ->get();
 
         return view('match-matching.index', compact(
             'currentTeam',

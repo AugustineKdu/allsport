@@ -10,6 +10,7 @@
         </div>
 
         <!-- Current Team Info -->
+        @if($currentTeam)
         <div class="bg-white rounded-lg shadow-md p-6 mb-8">
             <div class="flex items-center justify-between">
                 <div>
@@ -23,6 +24,21 @@
                 </div>
             </div>
         </div>
+        @else
+        <div class="bg-blue-50 rounded-lg shadow-md p-6 mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-xl font-semibold text-blue-900">팀이 없습니다</h2>
+                    <p class="text-blue-700">매칭을 하려면 먼저 팀에 가입하거나 팀을 만들어야 합니다.</p>
+                </div>
+                <div class="text-right">
+                    <a href="{{ route('teams.index') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        팀 찾기
+                    </a>
+                </div>
+            </div>
+        </div>
+        @endif
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <!-- Left Column: Available Teams & My Requests -->
@@ -41,11 +57,19 @@
                                             <p class="text-sm text-gray-600">{{ $team->city }} {{ $team->district }}</p>
                                             <p class="text-sm text-blue-600">{{ $team->sport }}</p>
                                         </div>
-                                        <button
-                                            onclick="openRequestModal({{ $team->id }}, '{{ $team->team_name }}')"
-                                            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm">
-                                            매칭 요청
-                                        </button>
+                                        @if($currentTeam)
+                                            <button
+                                                onclick="openRequestModal({{ $team->id }}, '{{ $team->team_name }}')"
+                                                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                                                매칭 요청
+                                            </button>
+                                        @else
+                                            <button
+                                                disabled
+                                                class="bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed text-sm">
+                                                팀 가입 필요
+                                            </button>
+                                        @endif
                                     </div>
                                 </div>
                             @endforeach
