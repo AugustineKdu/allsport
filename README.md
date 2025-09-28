@@ -2,6 +2,44 @@
 
 This document describes the architecture, data model, user flows and key logic for the **AllSports** web platform. It is designed as a mobile‑friendly web application built with **Laravel** and **Blade**.  The goal is to offer a lightweight yet functional portal for amateur sports teams to manage memberships, record matches and view rankings across regions.
 
+## 데이터 백업 및 복원 시스템
+
+### 자동 백업
+- 매일 오전 2시(KST)에 자동으로 데이터베이스 백업
+- SQLite 파일과 JSON 형식으로 이중 백업
+- `backups/database_latest.sqlite` 및 `backups/database_latest.json` 파일로 저장
+
+### 수동 백업
+```bash
+# SQLite 파일 백업
+php artisan backup:database
+
+# JSON 형식 백업
+php artisan backup:database --json
+
+# GitHub에 백업 푸시
+./scripts/push-backup.sh
+```
+
+### 데이터 복원
+```bash
+# 최신 백업에서 복원
+php artisan restore:database
+
+# 특정 백업 파일에서 복원
+php artisan restore:database 2025-09-28_120000
+
+# JSON 파일에서 복원
+php artisan restore:database --json
+
+# 재배포 시 전체 초기화 및 복원
+./scripts/init-restore.sh
+```
+
+### 고정 어드민 계정
+- developer@allsports.com / password
+- owner@allsports.com / password
+
 ## 1. Goals and Scope
 
 - Deliver an **app‑like mobile web experience**: a fixed bottom tab bar with five sections (Home, Teams, Matches, Rankings and My Page) while allowing only the central content to change.

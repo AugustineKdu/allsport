@@ -22,3 +22,10 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Backup files
+/backups/*
+# But track latest backups for restoration
+!/backups/database_latest.sqlite
+!/backups/database_latest.json
+!/backups/.gitkeep
