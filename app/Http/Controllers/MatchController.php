@@ -79,7 +79,11 @@ class MatchController extends Controller
         $cityOptions = GameMatch::distinct()->pluck('city')->filter()->sort()->values();
         $sportOptions = GameMatch::distinct()->pluck('sport')->filter()->sort()->values();
 
-        return view('matches.index', compact('matches', 'currentTeam', 'availableTeams', 'sentInvitations', 'receivedInvitations', 'statusOptions', 'cityOptions', 'sportOptions'));
+        // Initialize empty collections for removed match request system
+        $myRequests = collect();
+        $incomingRequests = collect();
+
+        return view('matches.index', compact('matches', 'currentTeam', 'availableTeams', 'sentInvitations', 'receivedInvitations', 'myRequests', 'incomingRequests', 'statusOptions', 'cityOptions', 'sportOptions'));
     }
 
     /**
