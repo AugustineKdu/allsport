@@ -41,14 +41,11 @@ class MatchMatchingController extends Controller
             // 같은 스포츠의 다른 팀들 (매칭 요청 가능한 팀들) - 지역 제한 해제
             $availableTeams = Team::where('sport', $currentTeam->sport)
                 ->where('id', '!=', $currentTeam->id)
-                ->where('is_active', true)
                 ->with(['owner'])
                 ->get();
         } else {
-            // 팀이 없는 경우 모든 활성 팀을 표시
-            $availableTeams = Team::where('is_active', true)
-                ->with(['owner'])
-                ->get();
+            // 팀이 없는 경우 모든 팀을 표시
+            $availableTeams = Team::with(['owner'])->get();
         }
 
         return view('match-matching.index', compact(

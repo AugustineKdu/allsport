@@ -51,17 +51,27 @@
                         주로 활동하실 지역을 선택하세요
                     </label>
 
-                    <div class="grid grid-cols-2 gap-3 max-h-60 overflow-y-auto">
-                        @foreach($regions as $region)
-                            <label class="block cursor-pointer">
-                                <input type="radio" name="district" value="{{ $region->district }}" class="sr-only district-radio" {{ old('district') == $region->district ? 'checked' : '' }}>
-                                <div class="district-option bg-white/20 hover:bg-white/30 active:bg-white/40 backdrop-blur-sm rounded-xl p-3 border-2 border-white/30 text-center transition-all duration-200">
-                                    <div class="text-2xl mb-2">🏢</div>
-                                    <div class="text-white font-bold text-sm mb-1">{{ $region->district }}</div>
-                                    <div class="text-white/80 text-xs">{{ $region->city }}</div>
-                                </div>
-                            </label>
-                        @endforeach
+                    <div class="mb-4">
+                        <label for="city" class="block text-white/90 text-sm font-medium mb-3">
+                            시/도를 먼저 선택하세요
+                        </label>
+                        <select name="city" id="city" class="w-full px-4 py-4 bg-white rounded-2xl border-0 text-gray-800 placeholder-gray-400 text-lg font-medium shadow-sm focus:ring-2 focus:ring-white/50 focus:outline-none" required>
+                            <option value="">시/도를 선택하세요</option>
+                            @foreach($cities as $city)
+                                <option value="{{ $city }}" {{ old('city') == $city ? 'selected' : '' }}>
+                                    {{ $city }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div id="district-container" class="hidden">
+                        <label class="block text-white/90 text-sm font-medium mb-3">
+                            구/군을 선택하세요
+                        </label>
+                        <div class="grid grid-cols-2 gap-3 max-h-60 overflow-y-auto" id="district-grid">
+                            <!-- Districts will be loaded here -->
+                        </div>
                     </div>
 
                     @error('district')
@@ -192,17 +202,27 @@
                         주로 활동하실 지역을 선택하세요
                     </label>
 
-                    <div class="grid grid-cols-3 gap-4 max-h-80 overflow-y-auto">
-                        @foreach($regions as $region)
-                            <label class="block cursor-pointer">
-                                <input type="radio" name="district" value="{{ $region->district }}" class="sr-only desktop-district-radio" {{ old('district') == $region->district ? 'checked' : '' }}>
-                                <div class="bg-white/20 hover:bg-white/30 active:bg-white/40 backdrop-blur-sm rounded-xl p-4 border-2 border-white/30 text-center transition-all duration-200">
-                                    <div class="text-3xl mb-3">🏢</div>
-                                    <div class="text-white font-bold text-sm mb-1">{{ $region->district }}</div>
-                                    <div class="text-white/80 text-xs">{{ $region->city }}</div>
-                                </div>
-                            </label>
-                        @endforeach
+                    <div class="mb-6">
+                        <label for="city_desktop" class="block text-white/90 font-medium mb-4">
+                            시/도를 먼저 선택하세요
+                        </label>
+                        <select name="city" id="city_desktop" class="w-full px-5 py-4 bg-white rounded-2xl border-0 text-gray-800 placeholder-gray-400 text-lg font-medium shadow-sm focus:ring-2 focus:ring-white/50 focus:outline-none" required>
+                            <option value="">시/도를 선택하세요</option>
+                            @foreach($cities as $city)
+                                <option value="{{ $city }}" {{ old('city') == $city ? 'selected' : '' }}>
+                                    {{ $city }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div id="district-container-desktop" class="hidden">
+                        <label class="block text-white/90 font-medium mb-6">
+                            구/군을 선택하세요
+                        </label>
+                        <div class="grid grid-cols-3 gap-4 max-h-80 overflow-y-auto" id="district-grid-desktop">
+                            <!-- Districts will be loaded here -->
+                        </div>
                     </div>
 
                     @error('district')
@@ -284,35 +304,72 @@
     @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Mobile district selection
-            const districtRadios = document.querySelectorAll('.district-radio');
-            districtRadios.forEach(radio => {
-                const option = radio.parentElement.querySelector('.district-option');
+            const citySelect = document.getElementById('city');
+            const districtContainer = document.getElementById('district-container');
+            const districtGrid = document.getElementById('district-grid');
 
-                radio.addEventListener('change', function() {
-                    // Remove selected class from all district options
-                    document.querySelectorAll('.district-option').forEach(opt => {
-                        opt.classList.remove('border-white', 'bg-white/30');
-                        opt.classList.add('border-white/30');
-                    });
+            // City selection change handler
+            citySelect.addEventListener('change', function() {
+                const selectedCity = this.value;
+                
+                if (selectedCity) {
+                    // Load districts for selected city
+                    fetch(`/api/regions/${selectedCity}/districts`)
+                        .then(response => response.json())
+                        .then(districts => {
+                            // Clear existing districts
+                            districtGrid.innerHTML = '';
+                            
+                            // Add district options
+                            districts.forEach(district => {
+                                const label = document.createElement('label');
+                                label.className = 'block cursor-pointer';
+                                
+                                label.innerHTML = `
+                                    <input type="radio" name="district" value="${district}" class="sr-only district-radio">
+                                    <div class="district-option bg-white/20 hover:bg-white/30 active:bg-white/40 backdrop-blur-sm rounded-xl p-3 border-2 border-white/30 text-center transition-all duration-200">
+                                        <div class="text-2xl mb-2">🏢</div>
+                                        <div class="text-white font-bold text-sm mb-1">${district}</div>
+                                        <div class="text-white/80 text-xs">${selectedCity}</div>
+                                    </div>
+                                `;
+                                
+                                districtGrid.appendChild(label);
+                                
+                                // Add click handler for district selection
+                                const radio = label.querySelector('.district-radio');
+                                const option = label.querySelector('.district-option');
+                                
+                                radio.addEventListener('change', function() {
+                                    // Remove selected class from all district options
+                                    document.querySelectorAll('.district-option').forEach(opt => {
+                                        opt.classList.remove('border-white', 'bg-white/30');
+                                        opt.classList.add('border-white/30');
+                                    });
 
-                    // Add selected class to current option
-                    if (this.checked) {
-                        option.classList.remove('border-white/30');
-                        option.classList.add('border-white', 'bg-white/30');
-                    }
-                });
+                                    // Add selected class to current option
+                                    if (this.checked) {
+                                        option.classList.remove('border-white/30');
+                                        option.classList.add('border-white', 'bg-white/30');
+                                    }
+                                });
 
-                // Apply initial styling if already selected
-                if (radio.checked) {
-                    option.classList.remove('border-white/30');
-                    option.classList.add('border-white', 'bg-white/30');
+                                option.addEventListener('click', function() {
+                                    radio.checked = true;
+                                    radio.dispatchEvent(new Event('change'));
+                                });
+                            });
+                            
+                            // Show district container
+                            districtContainer.classList.remove('hidden');
+                        })
+                        .catch(error => {
+                            console.error('Error loading districts:', error);
+                        });
+                } else {
+                    // Hide district container
+                    districtContainer.classList.add('hidden');
                 }
-
-                option.addEventListener('click', function() {
-                    radio.checked = true;
-                    radio.dispatchEvent(new Event('change'));
-                });
             });
 
             // Mobile sport selection
@@ -341,38 +398,72 @@
                 }
             });
 
-            // Desktop district selection
-            const desktopDistrictRadios = document.querySelectorAll('.desktop-district-radio');
-            desktopDistrictRadios.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    // Remove selected class from all desktop district options
-                    desktopDistrictRadios.forEach(r => {
-                        const label = r.closest('label');
-                        label.querySelector('div').classList.remove('border-white', 'bg-white/30');
-                        label.querySelector('div').classList.add('border-white/30');
-                    });
+            // Desktop city selection
+            const cityDesktopSelect = document.getElementById('city_desktop');
+            const districtDesktopContainer = document.getElementById('district-container-desktop');
+            const districtDesktopGrid = document.getElementById('district-grid-desktop');
 
-                    // Add selected class to current option
-                    if (this.checked) {
-                        const label = this.closest('label');
-                        label.querySelector('div').classList.remove('border-white/30');
-                        label.querySelector('div').classList.add('border-white', 'bg-white/30');
-                    }
-                });
+            cityDesktopSelect.addEventListener('change', function() {
+                const selectedCity = this.value;
+                
+                if (selectedCity) {
+                    // Load districts for selected city
+                    fetch(`/api/regions/${selectedCity}/districts`)
+                        .then(response => response.json())
+                        .then(districts => {
+                            // Clear existing districts
+                            districtDesktopGrid.innerHTML = '';
+                            
+                            // Add district options
+                            districts.forEach(district => {
+                                const label = document.createElement('label');
+                                label.className = 'block cursor-pointer';
+                                
+                                label.innerHTML = `
+                                    <input type="radio" name="district" value="${district}" class="sr-only desktop-district-radio">
+                                    <div class="bg-white/20 hover:bg-white/30 active:bg-white/40 backdrop-blur-sm rounded-xl p-4 border-2 border-white/30 text-center transition-all duration-200">
+                                        <div class="text-3xl mb-3">🏢</div>
+                                        <div class="text-white font-bold text-sm mb-1">${district}</div>
+                                        <div class="text-white/80 text-xs">${selectedCity}</div>
+                                    </div>
+                                `;
+                                
+                                districtDesktopGrid.appendChild(label);
+                                
+                                // Add click handler for district selection
+                                const radio = label.querySelector('.desktop-district-radio');
+                                const option = label.querySelector('div');
+                                
+                                radio.addEventListener('change', function() {
+                                    // Remove selected class from all desktop district options
+                                    districtDesktopGrid.querySelectorAll('div').forEach(opt => {
+                                        opt.classList.remove('border-white', 'bg-white/30');
+                                        opt.classList.add('border-white/30');
+                                    });
 
-                // Apply initial styling if already selected
-                if (radio.checked) {
-                    const label = radio.closest('label');
-                    label.querySelector('div').classList.remove('border-white/30');
-                    label.querySelector('div').classList.add('border-white', 'bg-white/30');
+                                    // Add selected class to current option
+                                    if (this.checked) {
+                                        option.classList.remove('border-white/30');
+                                        option.classList.add('border-white', 'bg-white/30');
+                                    }
+                                });
+
+                                option.addEventListener('click', function() {
+                                    radio.checked = true;
+                                    radio.dispatchEvent(new Event('change'));
+                                });
+                            });
+                            
+                            // Show district container
+                            districtDesktopContainer.classList.remove('hidden');
+                        })
+                        .catch(error => {
+                            console.error('Error loading districts:', error);
+                        });
+                } else {
+                    // Hide district container
+                    districtDesktopContainer.classList.add('hidden');
                 }
-
-                // Handle click on option
-                const label = radio.closest('label');
-                label.addEventListener('click', function() {
-                    radio.checked = true;
-                    radio.dispatchEvent(new Event('change'));
-                });
             });
 
             // Desktop sport selection

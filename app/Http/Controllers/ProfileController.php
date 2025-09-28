@@ -43,18 +43,19 @@ class ProfileController extends Controller
     {
         $user = $request->user();
 
-        // Get all regions for selection
-        $regions = Region::active()
+        // Get cities for selection
+        $cities = Region::active()
+            ->select('city')
+            ->distinct()
             ->orderBy('city')
-            ->orderBy('district')
-            ->get();
+            ->pluck('city');
 
         // Get sports for sport selection
         $sports = Sport::active()->get();
 
         return view('profile.edit', [
             'user' => $user,
-            'regions' => $regions,
+            'cities' => $cities,
             'sports' => $sports,
         ]);
     }
@@ -67,12 +68,14 @@ class ProfileController extends Controller
         $validated = $request->validate([
             'nickname' => 'required|string|max:20|unique:users,nickname,' . $request->user()->id,
             'phone' => 'required|string|max:20',
+            'city' => 'required|string|exists:regions,city',
             'district' => 'required|string|exists:regions,district',
             'selected_sport' => 'nullable|string|exists:sports,sport_name',
         ]);
 
-        // Find the selected region to get the city
-        $region = Region::where('district', $validated['district'])
+        // Verify city and district combination
+        $region = Region::where('city', $validated['city'])
+            ->where('district', $validated['district'])
             ->where('is_active', true)
             ->first();
 
@@ -84,7 +87,7 @@ class ProfileController extends Controller
         $user->update([
             'nickname' => $validated['nickname'],
             'phone' => $validated['phone'],
-            'city' => $region->city,
+            'city' => $validated['city'],
             'district' => $validated['district'],
             'selected_sport' => $validated['selected_sport'],
             'onboarding_done' => true, // 프로필 설정 완료로 표시

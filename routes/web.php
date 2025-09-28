@@ -50,6 +50,21 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/matches/{match}/edit-result', [MatchController::class, 'editResult'])->name('matches.edit-result');
         Route::patch('/matches/{match}/result', [MatchController::class, 'updateResult'])->name('matches.update-result');
 
+        // Region API routes
+        Route::get('/api/regions/{city}/districts', function ($city) {
+            return App\Models\Region::where('city', $city)
+                ->where('is_active', true)
+                ->orderBy('district')
+                ->pluck('district');
+        });
+
+        Route::get('/api/teams/regions/{city}/districts', function ($city) {
+            return App\Models\Region::where('city', $city)
+                ->where('is_active', true)
+                ->orderBy('district')
+                ->pluck('district');
+        });
+
         // Match Matching
         Route::get('/match-matching', [App\Http\Controllers\MatchMatchingController::class, 'index'])->name('match-matching.index');
         Route::post('/match-matching', [App\Http\Controllers\MatchMatchingController::class, 'store'])->name('match-matching.store');

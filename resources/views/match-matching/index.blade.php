@@ -1,6 +1,4 @@
-@extends('layouts.app')
-
-@section('content')
+<x-app-layout>
 <div class="container mx-auto px-4 py-8">
     <div class="max-w-6xl mx-auto">
         <!-- Header -->
@@ -257,4 +255,4 @@ document.getElementById('requestModal').addEventListener('click', function(e) {
     }
 });
 </script>
-@endsection
+</x-app-layout>

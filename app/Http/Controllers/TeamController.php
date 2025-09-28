@@ -91,15 +91,16 @@ class TeamController extends Controller
                 ->with('error', '이미 팀을 소유하고 있습니다.');
         }
 
-        // Get all regions for selection
-        $regions = Region::active()
+        // Get cities for selection
+        $cities = Region::active()
+            ->select('city')
+            ->distinct()
             ->orderBy('city')
-            ->orderBy('district')
-            ->get();
+            ->pluck('city');
 
         $sports = Sport::active()->get();
 
-        return view('teams.create', compact('regions', 'sports'));
+        return view('teams.create', compact('cities', 'sports'));
     }
 
     /**
@@ -109,12 +110,14 @@ class TeamController extends Controller
     {
         $validated = $request->validate([
             'team_name' => 'required|string|max:50',
+            'city' => 'required|string|exists:regions,city',
             'district' => 'required|string|exists:regions,district',
             'sport' => 'required|string|exists:sports,sport_name',
         ]);
 
-        // Find the selected region to get the city
-        $region = Region::where('district', $validated['district'])
+        // Verify city and district combination
+        $region = Region::where('city', $validated['city'])
+            ->where('district', $validated['district'])
             ->where('is_active', true)
             ->first();
 
@@ -127,7 +130,7 @@ class TeamController extends Controller
         try {
             $team = Team::create([
                 'team_name' => $validated['team_name'],
-                'city' => $region->city,
+                'city' => $validated['city'],
                 'district' => $validated['district'],
                 'sport' => $validated['sport'],
                 'owner_user_id' => Auth::id(),

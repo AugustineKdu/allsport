@@ -22,15 +22,16 @@ class OnboardingController extends Controller
             return redirect()->route('dashboard');
         }
 
-        // Get all regions for selection
-        $regions = Region::active()
+        // Get cities for selection
+        $cities = Region::active()
+            ->select('city')
+            ->distinct()
             ->orderBy('city')
-            ->orderBy('district')
-            ->get();
+            ->pluck('city');
 
         $sports = Sport::active()->get();
 
-        return view('onboarding.index', compact('regions', 'sports'));
+        return view('onboarding.index', compact('cities', 'sports'));
     }
 
     /**
@@ -40,13 +41,15 @@ class OnboardingController extends Controller
     {
         $validated = $request->validate([
             'nickname' => 'required|string|max:20|unique:users,nickname',
+            'city' => 'required|string',
             'district' => 'required|string',
             'selected_sport' => 'required|string|exists:sports,sport_name',
             'phone' => 'required|string|max:20',
         ]);
 
-        // Find the selected region
-        $region = Region::where('district', $validated['district'])
+        // Verify city and district combination
+        $region = Region::where('city', $validated['city'])
+            ->where('district', $validated['district'])
             ->where('is_active', true)
             ->first();
 
@@ -57,7 +60,7 @@ class OnboardingController extends Controller
         $user = Auth::user();
         $user->update([
             'nickname' => $validated['nickname'],
-            'city' => $region->city,
+            'city' => $validated['city'],
             'district' => $validated['district'],
             'selected_sport' => $validated['selected_sport'],
             'phone' => $validated['phone'],
