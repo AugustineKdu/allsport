@@ -9,7 +9,7 @@ NC='\033[0m' # No Color
 PERSISTENT_DIR="/app/persistent"
 PERSISTENT_DB="${PERSISTENT_DIR}/database.sqlite"
 PERSISTENT_STORAGE="${PERSISTENT_DIR}/storage"
-APP_DB="database/database.sqlite"
+APP_DB="/tmp/database.sqlite"
 APP_STORAGE="storage/app"
 
 echo -e "${YELLOW}💾 데이터베이스 영구 저장소에 저장 중...${NC}"

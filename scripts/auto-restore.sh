@@ -10,14 +10,14 @@ NC='\033[0m' # No Color
 PERSISTENT_DIR="/app/persistent"
 PERSISTENT_DB="${PERSISTENT_DIR}/database.sqlite"
 PERSISTENT_STORAGE="${PERSISTENT_DIR}/storage"
-APP_DB="database/database.sqlite"
+APP_DB="/tmp/database.sqlite"
 APP_STORAGE="storage/app"
 
 echo -e "${YELLOW}🔍 AllSports 자동 복구 시스템 시작...${NC}"
 
 # 영구 저장소 디렉토리 생성
 mkdir -p "${PERSISTENT_DIR}"
-mkdir -p "database"
+mkdir -p "/tmp"
 
 # 데이터베이스 복구
 if [ -f "$PERSISTENT_DB" ]; then
@@ -43,8 +43,7 @@ else
         php artisan migrate --force
         
         # 기본 시더 실행
-        php artisan db:seed --class=RegionSeeder --force
-        php artisan db:seed --class=SportSeeder --force
+        php artisan db:seed --force
         
         # 영구 저장소에 저장
         cp "$APP_DB" "$PERSISTENT_DB"
@@ -75,6 +74,9 @@ php artisan view:cache
 # 스케줄러 설정 (백업 자동화)
 echo -e "${YELLOW}⏰ 자동 백업 스케줄러 설정...${NC}"
 (crontab -l 2>/dev/null; echo "* * * * * cd /app && php artisan schedule:run >> /dev/null 2>&1") | crontab -
+
+# 매 시간마다 영구 저장소에 백업
+(crontab -l 2>/dev/null; echo "0 * * * * cp /tmp/database.sqlite /app/persistent/database.sqlite") | crontab -
 
 echo -e "${GREEN}🎯 AllSports 준비 완료!${NC}"
 echo -e "${GREEN}   - 데이터베이스: $APP_DB${NC}"
