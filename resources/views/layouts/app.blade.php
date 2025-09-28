@@ -168,10 +168,15 @@
                                          <span class="text-base font-bold">팀</span>
                                      </a>
 
-                                     <!-- 경기 -->
-                                     <a href="{{ route('matches.index') }}" class="flex-1 text-center py-3 px-2 rounded-lg transition-all duration-200 {{ request()->routeIs('matches.*') ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50' }}">
-                                         <span class="text-base font-bold">경기</span>
-                                     </a>
+                      <!-- 경기 -->
+                      <a href="{{ route('matches.index') }}" class="flex-1 text-center py-3 px-2 rounded-lg transition-all duration-200 {{ request()->routeIs('matches.*') ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50' }}">
+                          <span class="text-base font-bold">경기</span>
+                      </a>
+
+                      <!-- 매칭 -->
+                      <a href="{{ route('match-matching.index') }}" class="flex-1 text-center py-3 px-2 rounded-lg transition-all duration-200 {{ request()->routeIs('match-matching.*') ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50' }}">
+                          <span class="text-base font-bold">매칭</span>
+                      </a>
 
                                      <!-- 랭킹 -->
                                      <a href="{{ route('rankings.index') }}" class="flex-1 text-center py-3 px-2 rounded-lg transition-all duration-200 {{ request()->routeIs('rankings.*') ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:text-blue-600 hover:bg-gray-50' }}">

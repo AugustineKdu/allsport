@@ -79,6 +79,24 @@
                             아마추어 스포츠 팀을 위한 플랫폼입니다.<br>
                             팀을 만들고, 경기를 관리하고, 랭킹을 확인하세요.
                         </p>
+
+                        <!-- Beta Service Notice -->
+                        <div class="mt-6 p-4 bg-gradient-to-r from-orange-50 to-yellow-50 border border-orange-200 rounded-lg max-w-2xl">
+                            <div class="flex items-start space-x-3">
+                                <div class="text-2xl">🚧</div>
+                                <div>
+                                    <h3 class="font-semibold text-orange-800 mb-1">베타 서비스 안내</h3>
+                                    <p class="text-sm text-orange-700 mb-2">
+                                        현재 AllSports는 베타 서비스입니다. 초기에는 <strong>축구와 풋살</strong>만 지원하며,
+                                        추후 다른 스포츠 종목도 추가될 예정입니다.
+                                    </p>
+                                    <p class="text-xs text-orange-600">
+                                        ⚠️ 베타 서비스 특성상 가끔 "안전하지 않은 정보" 경고가 나타날 수 있지만,
+                                        보안상 문제없으니 안심하고 이용해주세요. 빠른 시일 내에 해결하겠습니다.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                         <div class="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
                             <div class="rounded-md shadow">
                                 <a href="{{ route('register') }}" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:py-4 md:text-lg md:px-10">

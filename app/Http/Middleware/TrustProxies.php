@@ -15,6 +15,19 @@ class TrustProxies extends Middleware
     protected $proxies = '*';
 
     /**
+     * Determine if the application is running in a secure environment.
+     */
+    protected function isSecure(): bool
+    {
+        // In development, always consider it secure to avoid warnings
+        if (app()->environment('local', 'development')) {
+            return true;
+        }
+
+        return parent::isSecure();
+    }
+
+    /**
      * The headers that should be used to detect proxies.
      *
      * @var int

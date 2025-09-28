@@ -63,6 +63,7 @@ class RegionSeeder extends Seeder
             ['city' => '경기', 'district' => '화성시'],
             ['city' => '경기', 'district' => '광주시'],
             ['city' => '경기', 'district' => '여주시'],
+            ['city' => '경기', 'district' => '고양시'],
 
             // 인천광역시
             ['city' => '인천', 'district' => '중구'],

@@ -19,6 +19,18 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Development environment security settings
+        if (app()->environment('local', 'development')) {
+            // Disable secure cookie requirements in development
+            config([
+                'session.secure' => false,
+                'session.same_site' => 'lax',
+            ]);
+
+            // Set trusted proxies for development
+            config([
+                'trustedproxy.proxies' => '*',
+            ]);
+        }
     }
 }
