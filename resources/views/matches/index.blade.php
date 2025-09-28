@@ -3,15 +3,22 @@
          <div class="max-w-6xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
             <!-- Header -->
             <div class="text-center mb-8">
-                <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">경기 & 매칭</h1>
-                <p class="text-lg text-gray-600">경기 일정을 확인하고 다른 팀과 매칭하세요</p>
+                <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">경기</h1>
+                <p class="text-lg text-gray-600">경기 일정을 확인하고 새로운 경기를 생성하세요</p>
 
                 @if($currentTeam)
                     <div class="mt-4 flex justify-center">
-                        <button onclick="toggleMatchingSection()"
-                                class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold shadow-lg">
-                            ⚽ 매칭 요청하기
-                        </button>
+                        <a href="{{ route('matches.create') }}"
+                           class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold shadow-lg">
+                            ⚽ 경기 생성하기
+                        </a>
+                    </div>
+                @else
+                    <div class="mt-4 flex justify-center">
+                        <a href="{{ route('teams.index') }}"
+                           class="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors font-semibold shadow-lg">
+                            👥 팀에 가입하기
+                        </a>
                     </div>
                 @endif
             </div>
