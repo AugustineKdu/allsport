@@ -1,5 +1,9 @@
 name: allsport
 app: php
+volumes:
+  - name: allsports-data
+    size: 10
+    mount: /app/persistent
 options:
   ports: 9000
   docbase: /public
@@ -18,7 +22,7 @@ options:
     - name: DB_CONNECTION
       value: sqlite
     - name: DB_DATABASE
-      value: /tmp/database.sqlite
+      value: /app/persistent/database.sqlite
     - name: SESSION_DRIVER
       value: file
     - name: CACHE_STORE
@@ -52,7 +56,9 @@ options:
     - name: MIX_ASSET_URL
       value: "https://port-9000-allsport-m10pz2kw69fd7f89.sel4.cloudtype.app"
   buildenv: []
-  prestart: ""
+  prestart: |
+    chmod +x scripts/auto-restore.sh
+    ./scripts/auto-restore.sh
   start: bash start.sh
   strategy: rolling
 context:
