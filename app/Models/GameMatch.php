@@ -31,6 +31,8 @@ class GameMatch extends Model
         'away_team_name',
         'match_date',
         'match_time',
+        'venue',
+        'notes',
         'status',
         'home_score',
         'away_score',

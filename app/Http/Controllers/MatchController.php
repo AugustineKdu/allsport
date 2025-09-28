@@ -52,7 +52,7 @@ class MatchController extends Controller
         $availableTeams = collect();
         $sentInvitations = collect();
         $receivedInvitations = collect();
-        
+
         if ($currentTeam) {
             $availableTeams = Team::where('sport', $currentTeam->sport)
                 ->where('id', '!=', $currentTeam->id)

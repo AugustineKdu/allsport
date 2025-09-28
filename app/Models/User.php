@@ -51,7 +51,24 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'onboarding_done' => 'boolean',
+            'onboarded_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Check if user needs onboarding.
+     */
+    public function needsOnboarding(): bool
+    {
+        return is_null($this->onboarded_at);
+    }
+
+    /**
+     * Check if user has completed onboarding.
+     */
+    public function hasCompletedOnboarding(): bool
+    {
+        return !is_null($this->onboarded_at);
     }
 
     /**
