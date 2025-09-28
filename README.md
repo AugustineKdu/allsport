@@ -1,5 +1,7 @@
 # AllSports Web Platform
 
+> 🚀 **자동 배포 테스트**: 2024-09-28 - CloudType 자동 배포 시스템이 활성화되었습니다!
+
 This document describes the architecture, data model, user flows and key logic for the **AllSports** web platform. It is designed as a mobile‑friendly web application built with **Laravel** and **Blade**.  The goal is to offer a lightweight yet functional portal for amateur sports teams to manage memberships, record matches and view rankings across regions.
 
 ## 1. Goals and Scope
